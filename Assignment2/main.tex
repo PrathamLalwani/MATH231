@@ -1,0 +1,149 @@
+
+\documentclass{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[english]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{enumitem}
+
+% figure support
+\usepackage{import}
+\usepackage{xifthen}
+\pdfminorversion=7
+\usepackage{pdfpages}
+\usepackage{transparent}
+
+% \newcommand{\incfig}[1]{%
+% 	\def\svgwidth{\columnwidth}
+% 	\import{./figures/}{#1.pdf_tex}
+% }
+\pdfsuppresswarningpagegroup=1
+
+\input{preamble}
+\input{macros}
+\input{letterfonts}
+\title{\Huge{MATH 231 : Numerical ODEs}\\Random Examples}
+\author{\huge{Pratham Lalwani}}
+\date{\today}
+
+\begin{document}
+\maketitle
+\qs{Eigenvalues of special tridiagonal matrices}{
+
+This question is about finding eigenvalues of tridiagonal linear systems arising from applications, specifically finding the eigenvalues of an $n \times n$ matrix of the form,
+
+$$
+A=\left(\begin{array}{ccccc}
+a & b & & & \\
+c & a & b & & \\
+& \ddots & \ddots & \ddots & \\
+& & c & a & b \\
+& & & c & a
+\end{array}\right)
+$$
+
+where $a, b, c$ are real numbers with $b c>0$ (i.e. $b$ and $c$ have the same signs).
+\begin{enumerate}[label=(\alph*)]
+\item Show that the eigenvalue problem of $A$ is equivalent to the equations
+
+$$
+\begin{aligned}
+c v_{j-1}+(a-\lambda) v_j+b v_{j+1} & =0, \quad j=1, \ldots, n \\
+v_0 & =0=v_{n+1}
+\end{aligned}
+$$
+
+where $\boldsymbol{v}=\left(v_1, \ldots, v_n\right)^T$ is an eigenvector of $A$ associated with the eigenvalue $\lambda$.
+\item The recurrence relation (1) is a second order linear difference equation and can be solved similar to second order linear differential equations. By guessing $v_j=r^j$ for some constant $r$, show that $r$ satisfies
+
+$$
+r_{ \pm}=\frac{\lambda-a \pm \sqrt{(\lambda-a)^2-4 b c}}{2 b}, \quad \text { with } \quad r_{+} r_{-}=\frac{c}{b}
+$$
+
+\item Show by contradiction that $r_{ \pm}$must be distinct.
+
+Hint: if $r_{ \pm}=r$ are repeated, then $v_j=A r^j+B j r^j$ for some constants $A, B$.
+\item Since $r_{ \pm}$are distinct, the general solution for (1) is $v_j=A r_{+}^j+B r_{-}^j$ for constants $A, B$. Use this to conclude from (2) and (3) that,
+$$
+\left(\frac{b r_{+}^2}{c}\right)^{n+1}=1
+$$
+
+\item From part (c), (3) and (4), show that $r_{ \pm}$must be complex valued and conclude that (4) has the solutions for $k=1, \ldots, n$,
+
+$$
+r_{ \pm, k}=\sqrt{\frac{c}{b}} \exp \left(\frac{ \pm i k \pi}{n+1}\right), \quad \text { where } i=\sqrt{-1}
+$$
+
+\item Using part (e), conclude that the eigenvalues of $A$ is given by
+
+$$
+\lambda_k=a+2 \operatorname{sgn}\sqrt{b c} \cos \left(\frac{\pi k}{n+1}\right), \quad k=1, \ldots, n
+$$
+\item 
+	(g) Find the eigenvalues of the $n \times n$ finite difference matrix $A_h=\frac{1}{h^2}\left(\begin{array}{ccccc}2 & -1 & && \\ -1 & 2 & \ddots&&  \\ & \ddots & \ddots \\ &&-1&2&-1 \\   &&\\ &&&-1&2 \end{array}\right)$, where $h=\frac{1}{n+1}$.
+
+Conclude that $A_h$ is symmetric positive definite and find its condition number $\kappa\left(A_h\right)$ with respect to $\|\cdot\|_2$. Show that $\kappa\left(A_h\right)=\mathcal{O}\left(h^{-2}\right)$ as number of grid points $n$ increases. What does this mean for solving $A_h \boldsymbol{x}=\boldsymbol{b}$ when $n$ is large?
+
+\end{enumerate}
+}
+\begin{solution}
+	\begin{enumerate}[label=(\alph*)]
+		\item Let ($\lambda, \vec{v}$) be an eigenpair of $A$ 
+		\begin{align*}
+				\implies A\vec{v} &=   \lambda \vec{v}\\
+				\implies \left( A - \lambda I \right)\vec{v} = \vec{0} 	\\	
+				 \implies \left(\begin{array}{ccccc}
+av_1 + bv_2 \\
+cv_1 + av_2 + bv_3 \\
+ \vdots \\ 
+  cv_{n-2} + av_{n-1}+ b_{n} \\
+ c_{n-1} + a_n
+\end{array}   \right) &= \vec{0} \\
+\qed
+		\end{align*}	
+		
+	\end{enumerate}
+\end{solution}
+
+
+\qs{ Classical iterative methods for strictly diagonally dominant matrices}{
+	\begin{enumerate}[label=(\alph*)]
+\item Show that the diagonal part of any strictly diagonally dominant (S.D.D.) matrix is invertible.
+\item Recall the Gershgorin's theorem below, which can give useful information about the eigenvalues of a matrix. The eigenvalues of a complex valued matrix $A$ lies in the union of $n$ discs $\bigcup_{i=1}^n D_i$ on the complex plane, where
+$$
+D_i=\left\{z \in \mathbb{C}:\left|z-a_{i i}\right| \leq \sum_{j \neq i}\left|a_{i j}\right|\right\}
+$$
+Using Gershgorin's theorem, conclude S.D.D. matrices are invertible. Hint: Show that $0 \notin D_i$ for all $i=1, \ldots, n$.
+The next two parts are about showing convergence of Jacobi and Gauss-Seidel iterations for S.D.D. matrices.
+\item Recall the matrix $-M^{-1} N$ associated with the Jacobi iteration takes the form $-D^{-1}(L+U)$, where $A=L+D+U$.
+\item Let $A$ be S.D.D. and $\lambda$ be any eigenvalue of $-D^{-1}(L+U)$. Show that $\operatorname{det}(L+U+\lambda D)=0$ using part (a).
+(ii) Now suppose $|\lambda| \geq 1$. Deduce from $A$ being S.D.D. that $L+U+\lambda D$ must also be S.D.D.
+(iii) Deduce a contradiction by applying the result from part (b) to $L+U+\lambda D$, and conclude that $|\lambda|<1$.
+(iv) Combine parts (i)-(iii) to conclude that Jacobi iteration converges for S.D.D. matrices.
+\item Follow a similar argument as part (c) to show that Gauss-Seidel iterations converges for S.D.D. matrices.
+
+\end{enumerate}
+}
+\qs{Classical iterative methods for symmetric positive definite matrices
+}{
+
+This question is about coding and comparing classical iterative methods for the S.P.D. matrix $A_h$ from Q1(g).
+	\begin{enumerate}[label=(\alph*)]
+\item Write a pseudocode for the classical iterative methods: Richardson, optimal Richardson, Jacobi, Gauss-Seidel, S.O.R., and optimal S.O.R.
+\item Implement a program to solve $A_h \boldsymbol{x}=\boldsymbol{b}$ with $\boldsymbol{b}=(1, \ldots, 1)^T \in \mathbb{R}^{20}$ and $\boldsymbol{x}_0=(1,0, \ldots, 0)^T \in \mathbb{R}^{20}$ using Richardson (with $\omega=\lambda_{\max }^{-1}$ ), optimal Richardson, Jacobi, Gauss-Seidel, S.O.R. (with $\theta=1.2$ ) and optimal S.O.R. Generate a plot comparing the log of their residual in $\ell_2$ norm versus iterations up to 5000 . Rank the performance of each method by comparing the iterations needed to reach the residual tolerance of $10^{-14}$. Use sparse representation when appropriate. Hint: Use Q1(g) to find parameters for Richardson and vary $\theta$ to find an approximate optimal parameter for S.O.R. (c) Comment on the decreases in performance when $n=1000$. Explain briefly how this relates to $\kappa\left(A_h\right)=\mathcal{O}\left(h^{-2}\right)$.
+\end{enumerate}
+}
+\qs{Steepest Descent and Conjugate Gradient}
+{
+\begin{enumerate}[label=(\alph*)]
+\item Let $A$ be a S.P.D. matrix. Show that $(\boldsymbol{x}, \boldsymbol{y})_A:=\boldsymbol{x}^T A \boldsymbol{y}$ for $\boldsymbol{x}, \boldsymbol{y} \in \mathbb{R}^n$ forms an inner product on $\mathbb{R}^n$.
+\item Using part (a), conclude that $\|\boldsymbol{x}\|=(\boldsymbol{x}, \boldsymbol{x})_A^{1 / 2}$ for $\boldsymbol{x} \in \mathbb{R}^n$ is a norm on $\mathbb{R}^n$.
+
+Hint: You can assume the Cauchy-Schwarz inequality $\left|(\boldsymbol{x}, \boldsymbol{y})_A\right| \leq\|\boldsymbol{x}\|_A\|\boldsymbol{y}\|_A$ holds.
+\item For the method of Steepest Descent, show that $\nabla f\left(\boldsymbol{x}_k\right)$ and $\nabla f\left(\boldsymbol{x}_{k+1}\right)$ are orthogonal (i.e. zig-zaging behavior), where $f(\boldsymbol{y})=\frac{1}{2} \boldsymbol{y}^T A \boldsymbol{y}-\boldsymbol{y}^T \boldsymbol{b}$. Hint: Recall how the step size for Steepest Descent is determined.
+\item Repeat the experiment from $\mathbf{Q 3}(\mathbf{b})$ with $\boldsymbol{b}=(1, \ldots, 1)^T \in \mathbb{R}^{1000}$ and $\boldsymbol{x}_0=(1,0, \ldots, 0)^T \in \mathbb{R}^{1000}$ using the method of Steepest Descent and Conjugate Gradient. Generate a plot comparing the $\log$ of their residual in $\ell_2$ norm versus iterations up to 5000 . Rank their performance by comparing the iterations needed to reach the residual tolerance of $10^{-14}$, as well as versus the classical iterative methods. Verify your CG method terminates after the desired number of iterations. Use sparse representation when appropriate.
+\end{enumerate}
+}
+\end{document}
