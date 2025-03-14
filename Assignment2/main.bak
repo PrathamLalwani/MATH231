@@ -79,7 +79,7 @@
 		\item Using part (e), conclude that the eigenvalues of $A$ is given by
 
 		      $$
-			      \lambda_k=a+2 \operatorname{sgn}\sqrt{b c} \cos \left(\frac{\pi k}{n+1}\right), \quad k=1, \ldots, n
+			      \lambda_k=a+2 \operatorname{sgn}(\sqrt{b c}) \cos \left(\frac{\pi k}{n+1}\right), \quad k=1, \ldots, n
 		      $$
 		\item
 		      Find the eigenvalues of the $n \times n$ finite difference matrix $A_h=\frac{1}{h^2}\left(\begin{array}{ccccc}2 & -1 & && \\ -1 & 2 & \ddots&&  \\ & \ddots & \ddots \\ &&-1&2&-1 \\   &&\\ &&&-1&2 \end{array}\right)$, where $h=\frac{1}{n+1}$.
@@ -92,15 +92,15 @@
 	\begin{enumerate}[label=(\alph*)]
 		\item Let ($\lambda, \vec{v}$) be an eigenpair of $A$
 		      \begin{align*}
-			      \implies A\vec{v}                        & =   \lambda \vec{v} \\
-			      \implies \left( A - \lambda I \right)\vec{v} = \vec{0}         \\
-			      \implies \left(\begin{array}{ccccc}
-					                     \left( a-\lambda \right) v_1 + bv_2   \\
-					                     cv_1 + (a-\lambda)v_2 + bv_3          \\
-					                     \vdots                                \\
-					                     cv_{n-2} + (a-\lambda) v_{n-1}+ b_{n} \\
-					                     c_{n-1} + (a-\lambda) v_{n}
-				                     \end{array}   \right) & = \vec{0} .           \\
+			      A\vec{v}                                 & =   \lambda \vec{v} \\
+			      \left( A - \lambda I \right)\vec{v}      & = \vec{0}           \\
+			      \left(\begin{array}{ccccc}
+					            \left( a-\lambda \right) v_1 + bv_2   \\
+					            cv_1 + (a-\lambda)v_2 + bv_3          \\
+					            \vdots                                \\
+					            cv_{n-2} + (a-\lambda) v_{n-1}+ b_{n} \\
+					            c_{n-1} + (a-\lambda) v_{n}
+				            \end{array}   \right) & = \vec{0} .                    \\
 		      \end{align*}
 		      We can write the above relation as the following,
 		      \begin{equation}
@@ -117,10 +117,25 @@
 		      \[
 			      r_{\pm} = \frac{\lambda -a \pm \sqrt{(a-\lambda)^2 - 4bc} }{ 2b}.
 			      .\]
+		      As $r_{\pm}$ are the roots to a quadratic, hence $r_{+}r_{-} = \dfrac{c}{b}$
 		\item If \ref{req_rel} has a repeated root, say $r_{\pm} = r $ , then solution to the recursion would look like,
 		      \[
 			      v_{j} = Ar^j + Bjr^j
 			      .\]
+		      Checking the boundary conditions,
+		      $v_{0} = 0= v_{n+1}$
+		      \begin{equation}
+			      v_0 = A r^0 + B(0)r^{0} = A = 0 \label{v0}
+			      .\end{equation}
+		      \begin{equation}
+			      v_{n+1} = (0) r^{n+1} + B(n+1)r^{n+1} = B(n+1)r^{n+1} = 0      \implies B =0 \label{vn+1}
+			      .\end{equation}
+		      Combining \ref{v0} \& \ref{vn+1} gives,
+		      \[
+			      v_j  =0
+			      .\]
+		      Which is the trivial eigenvector. Hence, we cannot have a repeated root if we want a non-zero eigenvector.
+		\item
 	\end{enumerate}
 \end{solution}
 
