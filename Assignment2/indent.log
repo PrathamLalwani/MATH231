@@ -1,6 +1,6 @@
 INFO:  latexindent version 3.24.4, 2024-07-18, a script to indent .tex files
        latexindent lives here: /usr/local/texlive/2024/texmf-dist/scripts/latexindent/
-       Fri Mar 14 09:32:47 2025
+       Sun Mar 16 19:25:00 2025
        Filename: /home/pratham/School/Spring2025/MATH231/Assignment2/main.tex
 INFO:  Processing switches:
        -s|--silent: Silent mode active (you have used either -s or --silent)
@@ -14,8 +14,10 @@ INFO:  YAML reading settings
        latexindent.pl didn't find indentconfig.yaml or .indentconfig.yaml
        see all possible locations: https://latexindentpl.readthedocs.io/en/latest/sec-appendices.html#indentconfig-options)
 INFO:  Backup procedure (-w flag active):
-       /home/pratham/School/Spring2025/MATH231/Assignment2/main.bak will be overwritten (see onlyOneBackUp)
-       Backing up /home/pratham/School/Spring2025/MATH231/Assignment2/main.tex to /home/pratham/School/Spring2025/MATH231/Assignment2/main.bak...
+       /home/pratham/School/Spring2025/MATH231/Assignment2/main.bak0 already exists, incrementing by 1 (see maxNumberOfBackUps)
+       /home/pratham/School/Spring2025/MATH231/Assignment2/main.bak1 already exists, incrementing by 1 (see maxNumberOfBackUps)
+       /home/pratham/School/Spring2025/MATH231/Assignment2/main.bak2 will be overwritten (maxNumberOfBackUps reached, see maxNumberOfBackUps)
+       Backing up /home/pratham/School/Spring2025/MATH231/Assignment2/main.tex to /home/pratham/School/Spring2025/MATH231/Assignment2/main.bak2...
        /home/pratham/School/Spring2025/MATH231/Assignment2/main.tex will be overwritten after indentation
 INFO:  Phase 1: searching for objects
 INFO:  Phase 2: finding surrounding indentation
