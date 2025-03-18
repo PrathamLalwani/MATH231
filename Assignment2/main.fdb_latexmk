@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1742273247.33446 "main.tex" "main.pdf" "main" 1742273248.18521 0
+["pdflatex"] 1742313557.97223 "main.tex" "main.pdf" "main" 1742313558.78584 0
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/newpx/px-lms.enc" 1699569131 3877 2ca811886181a05a861d20a35de75e06 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -300,8 +300,8 @@
   "/usr/local/texlive/2024/texmf.cnf" 1740071572.43201 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
   "letterfonts.tex" 1741641923.49209 7365 b76f37e9ff1d4cecac7d1fd23fc626a6 ""
   "macros.tex" 1741641923.49209 1390 e02343db25b6b0a7b14fed906327ad7b ""
-  "main.aux" 1742273248.11588 1193 f19a8107a2f4173a9f23aabaf66ceb0f "pdflatex"
-  "main.tex" 1742273247.33287 23030 31cbfe3b9fa491bfd4814883db23c6eb ""
+  "main.aux" 1742313558.71422 1193 f19a8107a2f4173a9f23aabaf66ceb0f "pdflatex"
+  "main.tex" 1742313557.11319 23205 5346745d8084b18f1ff2032a73df7724 ""
   "preamble.tex" 1742152204.99983 19846 634f2263ca012a717479b65308032ed1 ""
   (generated)
   "main.aux"
