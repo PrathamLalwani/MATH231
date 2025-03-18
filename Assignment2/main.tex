@@ -78,7 +78,7 @@
 		\item Using part (e), conclude that the eigenvalues of $A$ is given by
 
 		      $$
-			      \lambda_k=a+2 \operatorname{sgn}(\sqrt{b c}) \cos \left(\frac{\pi k}{n+1}\right), \quad k=1, \ldots, n
+			      \lambda_k=a+2 \operatorname{sgn}\left(b  \right) \sqrt{bc} \cos \left(\frac{\pi k}{n+1}\right), \quad k=1, \ldots, n
 		      $$
 		\item
 		      Find the eigenvalues of the $n \times n$ finite difference matrix $A_h=\frac{1}{h^2}\left(\begin{array}{ccccc}2 & -1 & && \\ -1 & 2 & \ddots&&  \\ & \ddots & \ddots \\ &&-1&2&-1 \\   &&\\ &&&-1&2 \end{array}\right)$, where $h=\frac{1}{n+1}$.
@@ -144,11 +144,22 @@
 			      v_{n+1} & =  Ar_{+}^{n+1}  + Br_{-}^{n+1} =0 \implies r_{+}^{n+1} = r_{-}^{n+1} \label{rs_rel}
 		      \end{align}
 		      From, \ref{prod_rs} and \ref{rs_rel}, it follows that
-		      \begin{align*}
-			      \left( r_{+}^{2} \right)^{(n+1)}          & =  \left( \frac{c}{b} \right)^{n+1} \\
-			      \left( \frac{br_{+}^2}{c} \right)^{(n+1)} & = 1 \\
-		      \end{align*}
-
+		      \begin{align}
+			      \left( r_{+}^{2} \right)^{(n+1)}          & =  \left( \frac{c}{b} \right)^{n+1} \nonumber \\
+			      \left( \frac{br_{+}^2}{c} \right)^{(n+1)} & = 1 \label{rel_bcr}
+		      \end{align}
+		\item  We can observe in \ref{rel_bcr} that $\frac{br_{+}^{2}}{c}$ are the roots of unity, therefore,
+		      \[
+			      \frac{br_{+}^{2}}{c} = \exp\left( \frac{ik\pi}{n+1} \right) \implies r_{+} =  \sqrt{\frac{c}{b}} \exp\left( \frac{ik\pi}{n+1} \right) \quad k =0,\dots, n+1
+			      .\]
+		      Similarly,
+		      \[
+			      \frac{br_{-}^{2}}{c} = \exp\left( \frac{im\pi}{n+1} \right) \implies r_{-} =  \sqrt{\frac{c}{b}} \exp\left( \frac{im\pi}{n+1} \right) \quad m =0,\dots, n+1
+			      .\]
+		      Using \ref{prod_rs},
+		      \[
+			      r_{+}r_{-} =\frac{c}{b} \exp\left( \frac{i\left( k+m \right) \pi}{n+1} \right) =
+			      .\]
 	\end{enumerate}
 \end{solution}
 
@@ -268,7 +279,7 @@
 \begin{solution}
 
 	\begin{algorithm}[H]
-		\Fn{\FuncSty{ded(}{A,b,$\bm x_0$,$\omega$,tol,maxIter }\FuncSty{)}}{
+		\Fn{\FuncSty{RichardsonIteration(}{A,b,$\bm x_0$,$\omega$,tol,maxIter }\FuncSty{)}}{
 			\KwIn{\\A: The matrix to find the solution to \\  $\bm b$: The resultant vector in $A\bm x = \bm b$  \\ $\bm x_0$: The initial guess \\ $\omega$: Richardson parameter (fixed)  \\ maxIter: The maximum of iterations}
 			\KwOut{x: The solution to $A\bm x = \bm b$}
 			\SetAlgoLined
@@ -288,13 +299,13 @@
 	\end{algorithm}
 
 	\begin{algorithm}[H]
-		\Fn(){\FuncSty{ded(}{A,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
+		\Fn(){\FuncSty{OptimalRichardsonIteration(}{A,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
 			\KwIn{\\A: The matrix to find the solution to \\  $\bm b$: The resultant vector in $A\bm x = \bm b$  \\ $\bm x_0$: The initial guess \\  maxIter: The maximum of iterations}
 			\KwOut{x: The solution to $A\bm x = \bm b$}
 			\SetAlgoLined
 			\SetNoFillComment
 			\vspace{3mm}
-			$\omega \leftarrow \dfrac{2}{\lambda_{max}\left( A \right) + \lambda_{min}\left( A \right) }$ \\
+			$\omega \leftarrow \dfrac{2}{\lambda_{max}\left(A\right) + \lambda_{min}\left(A\right) }$ \\
 			\vspace{1mm}
 			$M \leftarrow \omega^{-1}I $ \\
 			$N \leftarrow A- M$\\
@@ -310,8 +321,8 @@
 	\end{algorithm}
 
 	\begin{algorithm}[H]
-		\Fn(){\FuncSty{ded(}{A,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
-			\KwIn{\\A: The matrix to find the solution to \\  $\bm b$: The resultant vector in $A\bm x = \bm b$  \\ $\bm x_0$: The initial guess \\ maxIter: The maximum of iterations}
+		\Fn(){\FuncSty{JacobiIteration(}{$A$,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
+			\KwIn{\\$A$:The matrix to find the solution to \\  $\bm b$: The resultant vector in $A\bm x = \bm b$  \\ $\bm x_0$: The initial guess \\ maxIter: The maximum of iterations}
 			\KwOut{x: The solution to $A\bm x = \bm b$}
 			\SetAlgoLined
 			\SetNoFillComment
@@ -331,7 +342,7 @@
 	\end{algorithm}
 
 	\begin{algorithm}[H]
-		\Fn(){\FuncSty{ded(}{A,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
+		\Fn(){\FuncSty{GaussSiedelIteration(}{A,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
 			\KwIn{\\A: The matrix to find the solution to \\  $\bm b$: The resultant vector in $A\bm x = \bm b$  \\ $\bm x_0$: The initial guess \\  maxIter: The maximum of iterations}
 			\KwOut{x: The solution to $A\bm x = \bm b$}
 			\SetAlgoLined
@@ -366,10 +377,75 @@
 \begin{solution}
 	\begin{enumerate}[label=(\alph*)]
 		\item $\left( .,. \right) $ is an inner-product if :
-		      \begin{enumerate}
+		      \begin{enumerate}[label=(\roman*)]
+			      \item  Conjugate Symmetery: \\
+			            \[
+				            \left( x,y \right)_{A}  = {\left(y,x\right)_A}
+				            .\]
+			      \item Linearity \\
+			            \[
+				            \left( a\vec{x}+b\vec{y}, \vec z \right)_A  = a \left( \vec x,\vec z  \right)_A +b\left(\vec  y,\vec z \right)_A
+				            .\]
+			      \item Positive-Definiteness:\\
+			            \[
+				            \left( \vec x, \vec x \right)_A  > 0
+				            .\]
+		      \end{enumerate}
+		      \begin{enumerate}[label = (\roman*)]
+			      \item \[
+				            \left( x,y \right)_A = x^{T}Ay = y^{T}Ax = \left( y,x \right)_A
+				            .\]
 			      \item
+			            \[
+				            \left( a\vec{x}+b\vec{y}, \vec z \right)_A = (a\vec{x}+b\vec{y})^{T} A \vec z=  a\vec{x}^{T} A \vec z+b\vec{y}^{T} A \vec z  = a \left( \vec x,\vec z  \right)_A +b\left(\vec  y,\vec z \right)_A
+				            .\]
 			      \item
-			      \item
+			            \[
+				            \left( x,x \right)_A = \vec x^{T} A  \vec x >0 \quad \text{As $A$ as is SPD}
+				            .\]
+			            Therefore, $\left( .,. \right)_A $ is an inner-product.
+		      \end{enumerate}
+		\item $\|.\|_A$ is an norm if :
+		      \begin{enumerate}[label=(\roman*)]
+			      \item  Positive Definitness : \\
+			            \[
+				            \|x\|_A > 0 \quad \forall \vec x \neq 0 \quad \land \quad \|\vec x\|_A = 0 \iff \vec x = \vec 0
+				            .\]
+			      \item Scalar Multiplication\\
+			            \[
+				            \|\lambda \vec x \|_A = \lambda \|\vec x\|_A
+				            .\]
+			      \item Sub-additivity (Triangle Inequality):\\
+			            \[
+				            \|\vec x+ \vec y\|_A = \| \vec x\|_A  + \| \vec y \|_A
+				            .\]
+
+		      \end{enumerate}
+
+		      \begin{enumerate}[label=(\roman*)]
+			      \item  	Let $x\in \RR^{n} $ and $\vec x \neq \vec 0$    \[
+				            \|x\|_A = \sqrt{\vec x^{T}A\vec x}  >0  \quad \text{,as $A$ is SPD}
+				            .\]
+			            Let $\|\vec x \|_A =0$
+			            \[
+				            \|\vec x \|_A =0 = \sqrt{\vec x^{T} A \vec x}  \iff \vec x = 0 \quad \text{, as $A$ is SPD}
+				            .\]
+
+			      \item Scalar Multiplication\\
+			            \[
+				            \|\lambda \vec x \|_A = \sqrt{\lambda \vec x^{T} A \lambda \vec x} = \sqrt{\lambda^{2} \vec x^{T} A \vec x}    = \lambda \|\vec x\|_A
+				            .\]
+			      \item Sub-additivity (Triangle Inequality):\\
+			            \begin{align*}
+				            \|\vec x+ \vec y\|_A
+				             & = \sqrt{\left( \vec x+ \vec y \right)^{T} A \left( \vec x+ \vec y \right)  } \\
+				             & =  \sqrt{\vec x^{T}A\vec x + \vec x^{T}A\vec y + \vec y^{T}A\vec x +\vec y^{T}A\vec y  } \\
+				             & = \sqrt{\vec x^{T}A\vec x + 2\vec x^{T}A\vec y +\vec y^{T}A\vec y  } \\
+				             & =   \sqrt{\|\vec x\|_A^2+ 2 \left( \vec x,\vec y \right)  +\|\vec y\|_A^2 } \\
+				             & \le  \sqrt{\|\vec x\|_A^{2}+ 2 \|\vec x\|_A\|\vec y\|_A   +\|\vec y\|_A^2 } \\
+				             & =  \| \vec x\|_A  + \| \vec y \|_A
+				            .\end{align*}
+			            Therefore, $\|x\|_A$ is valid norm.
 		      \end{enumerate}
 	\end{enumerate}
 \end{solution}
