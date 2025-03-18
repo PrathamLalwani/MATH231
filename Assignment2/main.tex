@@ -297,7 +297,7 @@
 				$\bm x  \leftarrow \bm x + \omega \bm r  $\\
 				$\bm r  \leftarrow \bm b - A\bm x$
 			}
-			\Return $\bm x$;
+			\Return $\bm x$
 			\caption{Richardson Iteration}
 		}
 	\end{algorithm}
@@ -319,7 +319,7 @@
 				$\bm x  \leftarrow \bm x + \omega \bm r  $\\
 				$\bm r  \leftarrow \bm b - A\bm x$
 			}
-			\Return $\bm x$;
+			\Return $\bm x$
 			\caption{Optimal Richardson Iteration}
 		}
 	\end{algorithm}
@@ -346,7 +346,7 @@
 	\end{algorithm}
 
 	\begin{algorithm}[H]
-		\Fn(){\FuncSty{GaussSiedelIteration(}{A,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
+		\Fn(){\FuncSty{GaussSeidelIteration(}{A,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
 			\KwIn{\\A: The matrix to find the solution to \\  $\bm b$: The resultant vector in $A\bm x = \bm b$  \\ $\bm x_0$: The initial guess \\  maxIter: The maximum of iterations}
 			\KwOut{x: The solution to $A\bm x = \bm b$}
 			\SetAlgoLined
@@ -362,8 +362,30 @@
 				$\bm r  \leftarrow \bm b - A\bm x$ \\
 				$i = i+1$
 			}
-			\Return $\bm x$;
-			\caption{Gauss-Sidel Iteration}
+			\Return $\bm x$
+			\caption{Gauss-Seidel Iteration}
+		}
+	\end{algorithm}
+
+	\begin{algorithm}[H]
+		\Fn(){\FuncSty{SORIteration(}{A,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
+			\KwIn{\\A: The matrix to find the solution to \\  $\bm b$: The resultant vector in $A\bm x = \bm b$  \\ $\bm x_0$: The initial guess \\  maxIter: The maximum of iterations}
+			\KwOut{x: The solution to $A\bm x = \bm b$}
+			\SetAlgoLined
+			\SetNoFillComment
+			\vspace{3mm}
+			$M \leftarrow $diag($A$)+lower($A$) \\
+			$N\leftarrow  A- M$\\
+			$\bm x \leftarrow  \bm x_0$\\
+			$\bm r \leftarrow \bm b-A\bm x  $\\
+			$i \leftarrow 0$ \\
+			\While{$\|r\|_2 <$ tol \textbf{and} $i <$ maxIter}  {
+				$\bm x  \leftarrow (1-\theta) x + \theta M^{-1}(\bm x + \bm b - N\bm x)  $\\
+				$\bm r  \leftarrow \bm b - A\bm x$ \\
+				$i = i+1$
+			}
+			\Return $\bm x$
+			\caption{SOR Iteration}
 		}
 	\end{algorithm}
 \end{solution}
