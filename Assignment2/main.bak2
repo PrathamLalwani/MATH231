@@ -108,10 +108,10 @@
 		      Where  $0\le j \le n+1$ and $v_{0} = 0 = v_{n+1}$
 		      \qed
 		\item Using the hint we guess the following form of the solution $v_{j} = r^j$. Substituting in \ref{req_rel},
-		      \begin{align*}
-			      cr^{j-1} + \left( a-\lambda \right) r^{j} + br^{j+1} & =   0 \\
-			      c + \left( a-\lambda \right) r + br^{2}              & =   0 \\
-			      .\end{align*}
+		      \begin{align}
+			      cr^{j-1} + \left( a-\lambda \right) r^{j} + br^{j+1} & =   0 \nonumber \\
+			      c + \left( a-\lambda \right) r + br^{2}              & =   0  \label{rel_rec_poly} \\
+			      .\end{align}
 		      Using the quadratic formula, we get
 		      \[
 			      r_{\pm} = \frac{\lambda -a \pm \sqrt{(a-\lambda)^2 - 4bc} }{ 2b}.
@@ -150,20 +150,54 @@
 		      \end{align}
 		\item  We can observe in \ref{rel_bcr} that $\frac{br_{+}^{2}}{c}$ are the roots of unity, therefore,
 		      \[
-			      \frac{br_{+}^{2}}{c} = \exp\left( \frac{ik\pi}{n+1} \right) \implies r_{+} =  \sqrt{\frac{c}{b}} \exp\left( \frac{ik\pi}{n+1} \right) \quad k =0,\dots, n+1
+			      \frac{br_{+}^{2}}{c} = \exp\left( \frac{2k\pi i}{n+1} \right) \implies r_{+} =  \sqrt{\frac{c}{b}} \exp\left( \frac{k\pi i}{n+1} \right) \quad k =0,\dots, n
 			      .\]
 		      Similarly,
 		      \[
-			      \frac{br_{-}^{2}}{c} = \exp\left( \frac{im\pi}{n+1} \right) \implies r_{-} =  \sqrt{\frac{c}{b}} \exp\left( \frac{im\pi}{n+1} \right) \quad m =0,\dots, n+1
+			      \frac{br_{-}^{2}}{c} = \exp\left( \frac{2m\pi i}{n+1} \right) \implies r_{-} =  \sqrt{\frac{c}{b}} \exp\left( \frac{m\pi i}{n+1} \right) \quad m =0,\dots, n
 			      .\]
+		      We discard the negative roots because they don't produce any new roots becuase of the relation between $r_{+}$ and $r_{-}$.
 		      Using \ref{prod_rs},
 		      \[
 			      r_{+}r_{-} =\frac{c}{b} \exp\left( \frac{i\left( k+m \right) \pi}{n+1} \right)=\frac{c}{b} \implies k=-m
 			      .\]
+		      For $k=0$ we get,
+		      \[r_{+} = r_{-} = \sqrt{\frac{c}{b}} \]
+		      Which is not possible as repeated roots cannot happen.
 		      Therefore we have,
 		      \[
 			      r_{\pm,k} = \sqrt{\frac{c}{b}} \exp\left( \frac{\pm ik\pi}{n+1} \right) \quad k=1,\dots, n
 			      .\]
+		\item  Using the polynomial \ref{rel_rec_poly} and relationship between sum quadratic roots and coeffiecients,
+		      \begin{align*}
+			      r_{+} + r_{-}                                                                                                                                                             & =  \frac{\lambda_k - a}{b} \\
+			      \sqrt{\frac{c}{b}} \exp\left( \frac{k\pi i}{n+1} \right)  + \sqrt{\frac{c}{b}} \exp\left( \frac{-k\pi i}{n+1} \right)                                                     & = \frac{\lambda_k - a}{b} \\
+			      \operatorname{sgn}\left( b \right) \sqrt{bc} \exp\left( \frac{k\pi i}{n+1} \right)  + \operatorname{sgn}\left( b \right) \sqrt{bc} \exp\left( \frac{-k\pi i}{n+1} \right) & = \lambda_k - a \\
+			      a + \operatorname{sgn}\left( b \right) \sqrt{bc} \left(\exp\left( \frac{k\pi i}{n+1} \right)  + \exp\left( \frac{-k\pi i}{n+1} \right)\right)                             & = \lambda_k \\
+			      a + 2\operatorname{sgn}\left( b \right) \sqrt{bc} \cos\left( \frac{k\pi }{n+1} \right)                                                                                    & = \lambda_k
+			      .\end{align*}
+		      Which is the desired result.
+		\item For the given matrix $A_h$, we have,
+		      \[
+			      a = 2,\quad b=c=-1
+			      .\]
+		      Using the formula derived above,
+		      \[
+			      \lambda_k =2 - 2\cos\left( \frac{k\pi}{n+1} \right) \qquad k=1,\dots,n
+			      .\]
+		      As $k=1,\dots,n \implies -1<\cos\left( \frac{k\pi}{n+1} \right)<1 \implies \lambda_{k} >0 \quad{k=1,\dots,n} \implies A$ is SPD.
+
+		      We get, $\lambda_{max}$ when $k=1$ and $\lambda_{min}$ when $k=n$.
+		      As $A$ is SPD, therefore, $\kappa(A_h)$ in $\ell_2$ norm is defined as follows,
+		      \begin{align*}
+			      \kappa(A_h) & = \frac{\lambda_{max}}{\lambda_{min}} \\
+			                  & = \frac{2 - 2\cos\left( \frac{n\pi}{n+1} \right)}{2 - 2\cos\left( \frac{\pi}{n+1} \right)} \\
+			                  & = \frac{2 - 2(1-\frac{1}{2}\left( \frac{n\pi}{n+1}\right)^{2} + \mathcal{O}\left( h^4 \right) )}{2 - 2(1-\frac{1}{2}\left( \frac{\pi}{n+1}\right)^{2}+ \mathcal{O}\left( h^4 \right))} \\
+			                  & = \frac{\left( \frac{n\pi}{n+1}\right)^{2}+\mathcal{O}\left( h^4 \right)}{\left( \frac{\pi}{n+1}\right)^{2}+\mathcal{O}\left( h^4 \right)} \\
+			                  & = \frac{ n^{2}+\mathcal{O}\left( h^2\right)}{1 +\mathcal{O}\left( h^2 \right)} \\
+			                  & = \mathcal{O}(n^{2}) = \mathcal O \left( h^{-2} \right)
+		      \end{align*}
+		      Therefore, as $\kappa(A_h)$ increases by 10 times, we lose 2 digits of accuracy atleast for direct methods.
 	\end{enumerate}
 \end{solution}
 
@@ -237,7 +271,9 @@
 
 		      \end{enumerate}
 		\item
-
+		      \begin{note}
+			      $L+D$ is invertible as the diagonal part is invertible and this would mean that $\det \left( L+D \right) \neq 0$.
+		      \end{note}
 		      \begin{enumerate} [label=(\roman*)]
 			      \item Let $\lambda$ be an eigenvalue of $-(L+D)^{-1}\left( U \right)$. Therefore we have $\vec v $ such that $\vec v \neq 0$,
 			            \begin{align*}
@@ -297,7 +333,7 @@
 				$\bm x  \leftarrow \bm x + \omega \bm r  $\\
 				$\bm r  \leftarrow \bm b - A\bm x$
 			}
-			\Return $\bm x$;
+			\Return $\bm x$
 			\caption{Richardson Iteration}
 		}
 	\end{algorithm}
@@ -319,7 +355,7 @@
 				$\bm x  \leftarrow \bm x + \omega \bm r  $\\
 				$\bm r  \leftarrow \bm b - A\bm x$
 			}
-			\Return $\bm x$;
+			\Return $\bm x$
 			\caption{Optimal Richardson Iteration}
 		}
 	\end{algorithm}
@@ -346,7 +382,7 @@
 	\end{algorithm}
 
 	\begin{algorithm}[H]
-		\Fn(){\FuncSty{GaussSiedelIteration(}{A,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
+		\Fn(){\FuncSty{GaussSeidelIteration(}{A,$\bm b$,$\bm x_0$,tol,maxIter }\FuncSty{)}}{
 			\KwIn{\\A: The matrix to find the solution to \\  $\bm b$: The resultant vector in $A\bm x = \bm b$  \\ $\bm x_0$: The initial guess \\  maxIter: The maximum of iterations}
 			\KwOut{x: The solution to $A\bm x = \bm b$}
 			\SetAlgoLined
@@ -362,8 +398,30 @@
 				$\bm r  \leftarrow \bm b - A\bm x$ \\
 				$i = i+1$
 			}
-			\Return $\bm x$;
-			\caption{Gauss-Sidel Iteration}
+			\Return $\bm x$
+			\caption{Gauss-Seidel Iteration}
+		}
+	\end{algorithm}
+
+	\begin{algorithm}[H]
+		\Fn(){\FuncSty{SORIteration(}{A,$\bm b$,$\bm x_0$,$\theta$,tol,maxIter }\FuncSty{)}}{
+			\KwIn{\\A: The matrix to find the solution to \\  $\bm b$: The resultant vector in $A\bm x = \bm b$  \\ $\bm x_0$: The initial guess \\ $\theta$: Amplification Parameter\\ maxIter: The maximum of iterations}
+			\KwOut{x: The solution to $A\bm x = \bm b$}
+			\SetAlgoLined
+			\SetNoFillComment
+			\vspace{3mm}
+			$M \leftarrow $diag($A$)+lower($A$) \\
+			$N\leftarrow  A- M$\\
+			$\bm x \leftarrow  \bm x_0$\\
+			$\bm r \leftarrow \bm b-A\bm x  $\\
+			$i \leftarrow 0$ \\
+			\While{$\|r\|_2 <$ tol \textbf{and} $i <$ maxIter}  {
+				$\bm x  \leftarrow (1-\theta) x + \theta M^{-1}(\bm x + \bm b - N\bm x)  $\\
+				$\bm r  \leftarrow \bm b - A\bm x$ \\
+				$i = i+1$
+			}
+			\Return $\bm x$
+			\caption{SOR Iteration}
 		}
 	\end{algorithm}
 \end{solution}
@@ -451,6 +509,22 @@
 				            .\end{align*}
 			            Therefore, $\|x\|_A$ is valid norm.
 		      \end{enumerate}
+		\item For a step $k$ we have to minimize $f$ along step length $\lambda$,
+		      \begin{align*}
+			      g(\lambda) = f(\vec x_k + \lambda \vec r_k)
+			      .\end{align*}
+		      Taking the derivative on both sides and setting it to $0$ (because minimization),
+		      \begin{align*}
+			      0=g'(\lambda) & =   \nabla f(\vec x_k + \lambda \vec r_k)^{T} r_k \\
+			                    & = \nabla f(x_{k+1})^{T} r_k \\
+			      .\end{align*}
+		      From class we also know that $\nabla f(\vec x) = A \vec x - \vec b = r$, therefore,
+
+		      \begin{align*}
+			      0=g'(\lambda) & =   \nabla f(x_{k+1})^{T} r_k \\
+			                    & =  \nabla f(\vec x_{k+1})^{T} \nabla f(\vec x_{k}) =0 \\
+			      .\end{align*}
+		      Which means $\nabla f(\vec x_{k+1})$ and  $\nabla f(\vec x_{k})$ are orthogonal.
 	\end{enumerate}
 \end{solution}
 \end{document}
