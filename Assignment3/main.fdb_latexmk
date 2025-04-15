@@ -1,13 +1,11 @@
 # Fdb version 4
-["pdflatex"] 1744675770.99021 "main.tex" "main.pdf" "main" 1744675771.85444 0
+["pdflatex"] 1744728803.55423 "main.tex" "main.pdf" "main" 1744728804.44315 0
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/enc/dvips/newpx/px-lms.enc" 1699569131 3877 2ca811886181a05a861d20a35de75e06 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecbi1000.tfm" 1136768653 3072 e6fe53b666f9cbd66cb135c6fdea66d3 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecbx0700.tfm" 1136768653 3584 ca0c423beaacd28d53ddce5a826cd558 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecbx1000.tfm" 1136768653 3584 2d666ecf6d466d8b007246bc2f94d9da ""
-  "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecbx2488.tfm" 1136768653 3584 0181dbc4d429c3ba4e30feba37b5df96 ""
-  "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/eccc2488.tfm" 1136768653 3072 0a9bb7969372717e6b61ec14d5eee9b0 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecrm0500.tfm" 1136768653 3584 178baad7ffca7f5d3428a83bd7cc64c3 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecrm0700.tfm" 1136768653 3584 cf973739aac7ab6247f9150296af7954 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecrm1000.tfm" 1136768653 3584 adb004a0c8e7c46ee66cad73671f37b4 ""
@@ -17,7 +15,6 @@
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecrm2488.tfm" 1136768653 3584 406ad7b70d9a41f7833f92b6313150c8 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecti1000.tfm" 1136768653 3072 3bce340d4c075dffe6d4ec732b4c32fe ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ectt1000.tfm" 1136768653 1536 06717a2b50de47d4087ac0e6cd759455 ""
-  "/usr/local/texlive/2024/texmf-dist/fonts/tfm/jknappen/ec/ecxc2488.tfm" 1136768653 3072 bed226f97a32eeca8e840082e205c6ac ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy5.tfm" 1246382020 1120 1e8878807317373affa7f7bba4cf2f6a ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy7.tfm" 1246382020 1120 7f9f170e8aa57527ad6c49feafd45d54 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmbsy9.tfm" 1246382020 1112 cbc11b646ccc26599775160605aaee3a ""
@@ -71,7 +68,6 @@
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfrm2488.pfb" 1215737283 131381 2285dee019b5f465b19f189dee464723 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfti1000.pfb" 1215737283 186554 e8f0fa8ca05e038f257a06405232745f ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb" 1215737283 169201 9ebf99020dde51a5086e186761a34e8f ""
-  "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/cm-super/sfxc2488.pfb" 1215737283 115470 5a4c8e877500939b73a813952213a627 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/newpx/NewPXMI.pfb" 1591136767 25273 57c06ae0831a03c4eb441ef7894a1639 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/newpx/NewPXMI_gnu.pfb" 1568087652 16003 379767f2e95213e4cfc7bfd5823fb860 ""
   "/usr/local/texlive/2024/texmf-dist/fonts/type1/public/newpx/pxmiaX.pfb" 1634082179 55131 37a379baccd50ac17c5ca120b382f7a1 ""
@@ -305,13 +301,11 @@
   "/usr/local/texlive/2024/texmf.cnf" 1740071572.43201 455 5b996dcaa0eb4ef14a83b026bc0a008c ""
   "letterfonts.tex" 1743708333.69001 7365 b76f37e9ff1d4cecac7d1fd23fc626a6 ""
   "macros.tex" 1743708333.69101 1390 e02343db25b6b0a7b14fed906327ad7b ""
-  "main.aux" 1744675771.7776 805 87b27b502a64ffa622941ab931f305a8 "pdflatex"
-  "main.tex" 1744675770.07257 25266 8598ee1384fb01b80a1c6ba3e4cde69c ""
-  "main.toc" 1744675771.7786 47 7a93bd25d0798768a37bc21d08fca155 "pdflatex"
+  "main.aux" 1744728804.36169 903 3e3c6d916b19d778337cf6586f42844d "pdflatex"
+  "main.tex" 1744728802.03164 31665 b7d03da406525ea2eea056136a65776b ""
   "preamble.tex" 1744596371.04919 19715 55e064545264235152499988c0df20ae ""
   (generated)
   "main.aux"
   "main.log"
   "main.pdf"
-  "main.toc"
   (rewritten before read)

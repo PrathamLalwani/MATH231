@@ -34,7 +34,7 @@
 \newpage
 
 \pdfbookmark[section]{\contentsname}{toc}
-\tableofcontents
+% \tableofcontents
 \pagebreak
 \qs{Polynomial Interpolation}{
 
@@ -121,43 +121,93 @@
 			            \].
 			            Therefore the corresponding Newton polynomial is,
 			            \begin{align*}
-				            f_3(x)= f_2(x) + f[x_0,x_1,x_2,x_3](x-x_0)(x-x_1)(x-x_2) \\
-				             & = 1 + 4x -2x^2 + (x+1)x(x-1) \\
-				             & = 1 + 4x -2x^2 + x^3 -x \\
-				             & = 1 + 3x -2x^2 + x^3 \\
+				            f_3(x) & = f_2(x) + f[x_0,x_1,x_2,x_3](x-x_0)(x-x_1)(x-x_2) \\
+				                   & = 1 + 4x -2x^2 + (x+1)x(x-1) \\
+				                   & = 1 + 4x -2x^2 + x^3 -x \\
+				                   & = 1 + 3x -2x^2 + x^3 \\
 			            \end{align*}
 		      \end{enumerate}
-		\item
+		\item \[
+			      \begin{array}{c|ccccccc}
+				      i & u_i & f[u_i] & f[u_i, u_{i+1}]         &                       &                               &                           &                         \\
+				      \hline
+				      0 & -1  & -5     &                         &                       &                               &                           &                         \\
+				        &     &        & 4                       &                       &                               &                           &                         \\
+				      1 & -1  & -5     &                         & \frac{6-4}{0-(-1)}=2  &                               &                           &                         \\
+				        &     &        & \frac{-5-1}{-1-0}= 6    &                       & \frac{-5-2}{0-(-1)} = -7      &                           &                         \\
+				      2 & 0   & 1      &                         & \frac{1-6}{0-(-1)}=-5 &                               & \frac{2-(-7)}{2-(-1)}= 3  &                         \\
+				        &     &        & 1                       &                       & \frac{1 - (-5)}{2 - (-2)} = 2 &                           & \frac{9 - 3}{2 + 1} = 2 \\
+				      3 & 0   & 1      &                         & \frac{3-1}{2-0}=1     &                               & \frac{29-2}{2 - (-1)} = 9 &                         \\
+				        &     &        & \frac{7 - 1}{2 - 0} = 3 &                       & \frac{59 - 1}{2 - 0}= 29      &                           &                         \\
+				      4 & 2   & 7      &                         & \frac{121-3}{2-0}=59  &                               &                           &                         \\
+				        &     &        & 121                     &                       &                               &                           &                         \\
+				      5 & 2   & 7      &                         &                       &                               &                           &
+			      \end{array}
+		      \]
 		\item 	\phantom{}\\
-		      \begin{algorithm}[H]
-			      \Fn{\FuncSty{NaivePolynomialEval(}{$a$,$x$,$\bm x$, $y$ }\FuncSty{)}}{
-				      \KwIn{\\$a$: The array of coefficients \\  $x$: Point of evaluation}
-				      \KwOut{\\sum: Polynomial evaluation}
-				      \SetAlgoLined
-				      \SetNoFillComment
-				      \vspace{3mm}
-				      s = 0\\
-				      n = len(a)\\
-				      \For{j=0 \dots n}{
-					      $l_i$=1\\
-					      \For{j= 1\dots n}{
-						      \If{$i \neq j$}{
-							      $l_i = l_{i} \cdot  \frac{x- x_{j}}{x_{i} - x_{j}}$\\
-						      }
-					      }
-					      sum = $y_i \cdot l_{i}$
-				      }
-				      return sum
-				      \caption{Richardson Iteration}
-			      }
-		      \end{algorithm}
-		      From the above we can see that it takes $\mathcal{O}\left( n^2 \right) $ to evaluate a polynomial.
+		      \begin{enumerate}[label=(\roman*)]
+			      \item \phantom{}\\
+			            \begin{algorithm}[H]
+				            \Fn{\FuncSty{NaivePolynomialEval(}{$a$,$x$,$\bm x$,$y$}\FuncSty{)}}{
+					            \KwIn{\\$a$: The array of coefficients \\  $x$: Point of evaluation}
+					            \KwOut{\\sum: Polynomial evaluation}
+					            \SetAlgoLined
+					            \SetNoFillComment
+					            \vspace{3mm}
+					            s = 0\\
+					            n = len(a)\\
+					            \For{i=0 \dots n}{
+						            $l_i$=1\\
+						            \For{j= 1\dots n}{
+							            \If{$i \neq j$}{
+								            $l_i = l_{i} \cdot  \frac{x- x_{j}}{x_{i} - x_{j}}$\\
+							            }
+						            }
+						            sum = $y_i \cdot l_{i}$
+					            }
+					            return sum
+					            \caption{Naive Polynomial Interpolation}
+				            }
+			            \end{algorithm}
+			            From the above we can see that it takes $\mathcal{O}\left( n^2 \right) $ to evaluate a polynomial.
+			      \item \begin{align*}
+				            f_{n}(x) & = \sum_{j=0}^{n} y_j \ell_j(x) \\
+				                     & = \sum_{j=0}^{n} y_j \frac{\prod_{j\neq i=0}^n (x-x_{i})}{\prod_{j\neq i=0}^n (x_{j}-x_{i})} \\
+				                     & = \sum_{j=0}^{n} y_j \frac{\prod_{i=0}^n (x-x_{i})}{(x-x_{j})\prod_{j\neq i=0}^n (x_{j}-x_{i})} \\
+				                     & = \ell(x) \sum_{j=0}^{n} \frac{y_j}{(x-x_{j})\prod_{j\neq i=0}^n (x_{j}-x_{i})} \\
+				                     & = \ell(x) \sum_{j=0}^{n} y_j \frac{w_j}{(x-x_{j})} \\
+			            \end{align*}
+			      \item  	\phantom{}\\
+			            \begin{algorithm}[H]
+				            \Fn{\FuncSty{NaivePolynomialEval(}{$a$,$x$,$\bm x$,$y$}\FuncSty{)}}{
+					            \KwIn{\\$a$: The array of coefficients \\  $x$: Point of evaluation}
+					            \KwOut{\\sum: Polynomial evaluation}
+					            \SetAlgoLined
+					            \SetNoFillComment
+					            \vspace{3mm}
+					            s = 0\\
+					            n = len(a)\\
+					            \For{j=0 \dots n}{
+						            $l_i$=1\\
+						            \For{j= 1\dots n}{
+							            \If{$i \neq j$}{
+								            $l_i = l_{i} \cdot  \frac{x- x_{j}}{x_{i} - x_{j}}$\\
+							            }
+						            }
+						            sum = $y_i \cdot l_{i}$
+					            }
+					            return sum
+					            \caption{Richardson Iteration}
+				            }
+			            \end{algorithm}
+			            From the above we can see that it takes $\mathcal{O}\left( n^2 \right) $ to evaluate a polynomial.
+			      \item
+		      \end{enumerate}
 	\end{enumerate}
 \end{solution}
 \qs{Spline Interpolation}{
 
 	\begin{enumerate}[label=(\alph*)]
-
 		\item Compute the constant, linear, natural cubic spline by hand for the data $\{(1,2),(2,3),(3,5)\}$.\\
 		\item Implement an $\mathcal{O}(n)$ program to interpolate $f(x)=\cos \left(x^{2}\right)$ with a clamped cubic spline $S(x)$ using $n=5,10,15,20$ uniformly-spaced nodes on $[0,2 \sqrt{\pi}]$ and plot resulting interpolants $S_{n} \overline{(x)}$ versus $f(x)$ on 100 uniformly-spaced nodes. Hint: Use your $\mathcal{O}(n)$ algorithm from $\mathbf{A 0}$ to solve the tridiagonal system for the coefficients $c_{i}$ and use Horner's method to evaluate the piecewise cubic polynomials for plotting.\\
 		\item Consider interpolating $f$ using a not-a-knot cubic spline on $a=x_{0}<x_{1}<\cdots<x_{n-1}<x_{n}=b$ (not necessarily uniformly spaced). Write down the linear system for determining the coefficients $c_{i}$ in the form
@@ -259,11 +309,11 @@
 		      Which gives the following linear system,
 		      \[
 			      A = \begin{pmatrix}
-				      -h_1 & (h_0+h_1) & h_0      &                     & 0       \\
-				      h_0  & (h_0+h_1) & h_1      &                     &         \\
-				           &           &          & \ddots              &         \\
-				           &           & h_{n-2}  & 2(h_{n-2} +h_{n-1}) & h_{n-1} \\
-				           &           & -h_{n-1} & 2(h_{n-2} +h_{n-1}) & h_{n-2} \\
+				      -h_1 & (h_0+h_1)  & -h_1     &                     & 0       \\
+				      h_0  & 2(h_0+h_1) & h_1      &                     &         \\
+				           & \ddots     & \ddots   & \ddots              &         \\
+				           &            & h_{n-2}  & 2(h_{n-2} +h_{n-1}) & h_{n-1} \\
+				           &            & -h_{n-1} & (h_{n-2} +h_{n-1})  & h_{n-2} \\
 			      \end{pmatrix}
 			      .\]
 		      \[
@@ -315,6 +365,40 @@
 			      + e^{\frac{-10\pi i}{8}} + 5e^{\frac{-12\pi i}{8}} + e^{\frac{-14\pi i}{8}} \\
 			                & =  5 + e^{\frac{-\pi i}{4}} + 5 e^{\frac{-\pi i }{2}} + e^{\frac{-3\pi i }{4}} -5
 			      - e^{\frac{-\pi i}{4}} - 5e^{\frac{-\pi i}{2}} - e^{\frac{-3\pi i}{4}} \\
+			                & = 0 \\
+			      \hat{f}_2 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-2j} \\
+			                & =   5 + e^{\frac{-4\pi i}{8}} + 5e^{\frac{-8\pi i }{8}} + e^{\frac{-12\pi i }{8}} +5 e^{\frac{-16\pi i }{8}}
+			      + e^{\frac{-20\pi i}{8}} + 5e^{\frac{-24\pi i}{8}} + e^{\frac{-28\pi i}{8}} \\
+			                & =  5 + e^{\frac{-\pi i}{2}} + 5 e^{-\pi i } + e^{\frac{-3\pi i }{2}} +5
+			      + e^{\frac{-5\pi i}{2}} + 5e^{-3\pi i} + e^{\frac{-7\pi i}{2}} \\
+			                & =  5 + e^{\frac{-\pi i}{2}} - 5  - e^{\frac{-\pi i }{2}} +5
+			      + e^{\frac{-\pi i}{2}} - 5 - e^{\frac{-\pi i}{2}} \\
+			                & = 0 \\
+			      \hat{f}_3 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-3j} \\
+			                & =   5 + e^{\frac{-3\pi i}{4}} + 5e^{\frac{-6\pi i }{4}} + e^{\frac{-9\pi i }{4}} +5 e^{\frac{-12\pi i }{4}}
+			      + e^{\frac{-15\pi i}{4}} + 5e^{\frac{-18\pi i}{4}} + e^{\frac{-21\pi i}{4}} \\
+			                & =  5 + e^{\frac{-3\pi i}{4}} - 5e^{\frac{-\pi i }{2}} + e^{\frac{-\pi i }{4}} -5
+			      - e^{\frac{-3\pi i}{4}} + 5e^{\frac{-\pi i}{2}} - e^{\frac{-\pi i}{4}} \\
+			                & =  0 \\
+			      \hat{f}_4 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-4j} \\
+			                & =   5 + e^{1\pi i} + 5e^{2\pi i} + e^{3\pi i} +5 e^{4\pi i}
+			      + e^{5\pi i} + 5e^{6\pi i} + e^{7\pi i} \\
+			                & =  5 - 1 + 5 - 1 +5 -1  + 5 -1 \\
+			                & =  16 \\
+			      \hat{f}_5 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-5j} \\
+			                & =   5 + e^{\frac{-5\pi i}{4}} + 5e^{\frac{-5\pi i }{2}} + e^{\frac{-15\pi i }{4}} +5 e^{-5\pi i }
+			      + e^{\frac{-25\pi i}{4}} + 5e^{\frac{-15\pi i}{2}} + e^{\frac{-35\pi i}{4}} \\
+			                & =  5 - e^{\frac{-\pi i}{4}} + 5e^{\frac{-\pi i }{2}} + e^{\frac{-\pi i }{4}} -5
+			      - e^{\frac{-3\pi i}{4}} + 5e^{\frac{-\pi i}{2}} - e^{\frac{-\pi i}{4}} \\
+			                & =  0 \\
+		      \end{align*}
+		\item Given that $\bm f = \left(5,1,5,0,0,0,0,0\right) $ we want to compute $\hat{\bm f} $
+
+		      \begin{align*}
+			      \hat{f}_0 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{0} = 11 \\
+			      \hat{f}_1 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-j} \\
+			                & =   5 + e^{\frac{-2\pi i}{8}} + 5e^{\frac{-4\pi i }{8}} + 0+0+ 0+ 0+ 0 \\
+			                & =  5 + e^{\frac{-\pi i}{4}} + 5 e^{\frac{-\pi i }{2}}  \\
 			                & = 0 \\
 			      \hat{f}_2 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-2j} \\
 			                & =   5 + e^{\frac{-4\pi i}{8}} + 5e^{\frac{-8\pi i }{8}} + e^{\frac{-12\pi i }{8}} +5 e^{\frac{-16\pi i }{8}}
@@ -423,7 +507,7 @@
 				            I(f) \approx I_\text{mid-point}(f) = \sum_{i=1}^{n} f\left(a+ih-\frac{h}{2}\right) h
 				            .\]
 			            \[
-							I(f) \approx \sum_{i=1}^{n} \exp\left(\left(a+ih-\frac{h}{2}\right)^{2}\right) h
+				            I(f) \approx \sum_{i=1}^{n} \exp\left(\left(a+ih-\frac{h}{2}\right)^{2}\right) h
 			            \]
 
 			            Doing the integral using the trapezoidal rule we get,
