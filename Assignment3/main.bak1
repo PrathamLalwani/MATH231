@@ -1,0 +1,129 @@
+\documentclass[a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[dutch]{babel}
+\usepackage{amsmath, amssymb}
+
+
+% figure support
+\usepackage{import}
+\usepackage{xifthen}
+\pdfminorversion=7
+\usepackage{pdfpages}
+\usepackage{transparent}
+\newcommand{\incfig}[1]{%
+	\def\svgwidth{\columnwidth}
+	\import{./figures/}{#1.pdf_tex}
+}
+
+\pdfsuppresswarningpagegroup=1
+
+\begin{document}
+\section*{Math 231 Assignment 3}
+\section*{Due online: Thursday, April 10}
+General Instructions: Submit online a PDF copy of your written solution with your name and student number. This may be hand written or typesetted in $\mathrm{EA}_{\mathrm{E}} \mathrm{X}$. Be sure scanned pages are in the correct orientation, with written answers (in numerically increasing order) for each questions clearly labelled. For questions involving programming, submit a single Jupyter notebook with all relevant program code, outputs, comments and explanations of your results. You may work together but you must write your own solution.\\
+Online Submission Files: A PDF file named A3-StudentNumber-LastName-FirstName.pdf and a Jupyter Notebook named A3-StudentNumber-LastName-FirstName.ipynb. For example, my submission files would be named A3-123456789-Wan-Andy.pdf and A3-123456789-Wan-Andy.ipynb.
+
+\section*{Q1. Polynomial Interpolation}
+(a) Consider the data $\{(-1,-5),(0,1),(1,3)\}$. This exercise is to compute by hand the Lagrange interpolant $f_{n}(x)$.\\
+(i) Compute $f_{2}(x)$ by hand using Newton basis functions and verify it interpolates the data.\\
+(ii) Suppose a new data point $(2,7)$ is added, repeat (i) and verify $f_{3}(x)$ interpolates the data.\\
+(b) Instead, suppose you have derivative information on the data $\{(-1,-5,4),(0,1,1),(2,7,121)\}$, compute by hand the Hermite interpolant $H_{5}(x)$ and verify that it interpolates the data.\\
+(c) Recall for $n+1$ data points $\left\{\left(x_{i}, y_{i}\right)\right\}_{i=0}^{n}$, the Lagrange interpolant written in terms of Lagrange basis is given by
+
+
+\begin{equation*}
+f_{n}(x)=\sum_{j=0}^{n} y_{j} \ell_{j}(x), \quad \text { where } \ell_{j}(x)=\frac{\prod_{j \neq i=0}^{n}\left(x-x_{i}\right)}{\prod_{j \neq i=0}^{n}\left(x_{j}-x_{i}\right)} . \tag{1}
+\end{equation*}
+
+
+This exercise is about evaluating $f_{n}(x)$ more efficiently on many different values of $x$, such as when plotting $f_{n}(x)$.\\
+(i) Show that evaluating $f_{n}(x)$ at a fixed value of $x$ using (1) directly involves $\mathcal{O}\left(n^{2}\right)$ costs.\\
+(ii) Instead, deduce that (1) can be rewritten as
+
+
+\begin{equation*}
+f_{n}(x)=\ell(x) \sum_{j=0}^{n} y_{j} \frac{w_{j}}{x-x_{j}}, \text { where } \ell(x)=\prod_{i=0}^{n}\left(x-x_{i}\right) \text { and } w_{j}=\left(\ell^{\prime}\left(x_{j}\right)\right)^{-1}=\left(\prod_{j \neq i=0}^{n}\left(x_{j}-x_{i}\right)\right)^{-1} . \tag{2}
+\end{equation*}
+
+
+(iii) Show that computing $\left\{w_{j}\right\}_{j=0}^{n}$ takes $\mathcal{O}\left(n^{2}\right)$ costs but it needs to be done only once for different values $x$.
+
+Hint: Unlike the expressions for $\ell_{j}(x)$, notice that $w_{j}$ only depends the nodes $\left\{x_{j}\right\}_{j=0}^{n}$.\\
+(iii) To further remove the need to compute $\ell(x)$, use (2) to deduce that (1) can be rewritten as
+
+
+\begin{equation*}
+f_{n}(x)=\left(\sum_{j=0}^{n} y_{j} \frac{w_{j}}{x-x_{j}}\right) /\left(\sum_{j=0}^{n} \frac{w_{j}}{x-x_{j}}\right) \tag{3}
+\end{equation*}
+
+
+This is also called the barycentric interpolation formula for $f_{n}(x)$.\\
+Hint: Recall $f_{n}(x)=f(x)$ for any polynomial function $f(x)$ up to degree $n$, in particular for $f(x)=1$.\\
+(iv) Conclude that once $\left\{w_{j}\right\}_{j=0}^{n}$ is computed and stored, evaluating $f_{n}(x)$ using (3) takes $\mathcal{O}(n)$ costs for each $x$.\\
+(v) Implement a program to interpolate $f(x)=\sin ^{3}(\pi x)$ on $[-1,1]$ using $n=5,10,15,20$ uniformly-spaced nodes and plot resulting interpolants $f_{n}(x)$ versus $f(x)$ on 100 uniformly-spaced nodes using (3).\\
+Hint: When evaluating $f_{n}\left(x_{i}\right)$ with (3), replace any NaN's in your output with $f\left(x_{i}\right)$.
+
+\section*{Q2. Spline Interpolation}
+(a) Compute the constant, linear, natural cubic spline by hand for the data $\{(1,2),(2,3),(3,5)\}$.\\
+(b) Implement an $\mathcal{O}(n)$ program to interpolate $f(x)=\cos \left(x^{2}\right)$ with a clamped cubic spline $S(x)$ using $n=5,10,15,20$ uniformly-spaced nodes on $[0,2 \sqrt{\pi}]$ and plot resulting interpolants $S_{n} \overline{(x)}$ versus $f(x)$ on 100 uniformly-spaced nodes. Hint: Use your $\mathcal{O}(n)$ algorithm from $\mathbf{A 0}$ to solve the tridiagonal system for the coefficients $c_{i}$ and use Horner's method to evaluate the piecewise cubic polynomials for plotting.\\
+(c) Consider interpolating $f$ using a not-a-knot cubic spline on $a=x_{0}<x_{1}<\cdots<x_{n-1}<x_{n}=b$ (not necessarily uniformly spaced). Write down the linear system for determining the coefficients $c_{i}$ in the form
+
+$$
+A \boldsymbol{c}=\boldsymbol{f}
+$$
+
+where $A$ is a tridiagonal matrix of $(n-1) \times(n-1), \boldsymbol{c} \in \mathbb{R}^{n-1}$ is the vector of $c_{i}$ coefficients, and $\boldsymbol{f} \in \mathbb{R}^{n-1}$ is the vector involving divided difference of $f$.\\
+Hint: Show that the not-a-knot boundary condition implies $d_{0}=d_{1}$ and $d_{n-1}=d_{n-2}$. Use these relations to deduce relations for $c_{0}$ and $c_{n}$ by substituting them into the boxed formula on Lecture 15-page 12.
+
+Q3. Trigonometric interpolation and Discrete Fourier Transform\\
+Denote the vectors $\boldsymbol{f}=\left(f_{0}, f_{1}, \ldots, f_{N-1}\right)^{T}$ and $\hat{\boldsymbol{f}}=\left(\hat{f}_{0}, \hat{f}_{1}, \ldots, \hat{f}_{N-1}\right)^{T}$. Recall that the Discrete Fourier Transform (DFT) of $\boldsymbol{f}$ is $\hat{\boldsymbol{f}}$ and the inverse Discrete Fourier Transform of $\hat{\boldsymbol{f}}$ is $\boldsymbol{f}$ given by in components
+
+
+\begin{equation*}
+\hat{f}_{k}=\sum_{j=0}^{N-1} f_{j} \omega_{N}^{-j k}, \quad f_{j}=\frac{1}{N} \sum_{k=0}^{N-1} \hat{f}_{k} \omega_{N}^{j k}, \quad \text { where } \omega_{N}:=e^{\frac{2 \pi i}{N}}, \text { for } 0 \leq k \leq N-1 \tag{4}
+\end{equation*}
+
+
+(a) Compute explicitly the DFT $\hat{\boldsymbol{f}}$ of $\boldsymbol{f}=(5,1,5,1,5,1,5,1)^{T}$ using (4). Sketch the associated truncated Fourier series $f_{N}(x)$ on $[0,2 \pi]$ ?\\
+(b) Set all frequency components $\hat{f}_{4}, \ldots, \hat{f}_{7}$ of $\hat{\boldsymbol{f}}$ to zero and call this vector $\tilde{\boldsymbol{f}}$. Now compute the inverse DFT of $\tilde{\boldsymbol{f}}$ and sketch the new truncated Fourier series $\tilde{f}_{N}(x)$ ? Explain why this result is expected.\\
+Remark: This is an example of a "low-pass" filter and has applications in signal processing.\\
+(c) The following exercise outlines the main idea behind the Fast Fourier Transform (FFT) algorithm introduced by Cooley and Tukey in 1965. For simplicity, we assume $N=2^{m}$ for some integer $m$.\\
+(i) For $0 \leq k \leq N-1$, show that the sum in (4) of the DFT can be written in terms of even/odd components as
+
+$$
+\hat{f}_{k}=\sum_{j=0}^{\frac{N}{2}-1} f_{2 j}\left(\omega_{\frac{N}{2}}\right)^{-j k}+\omega_{N}^{-k} \sum_{j=0}^{\frac{N}{2}-1} f_{2 j+1}\left(\omega_{\frac{N}{2}}\right)^{-j k}
+$$
+
+Hint: Express $\omega_{\frac{N}{2}}$ in terms of $\omega_{N}$.\\
+(ii) Denote $F F T(\boldsymbol{f}, N)$ as the DFT of $\boldsymbol{f}$ with $N$ components and define $\boldsymbol{\omega}:=\left(1, \omega_{N}^{-1}, \omega_{N}^{-2} \ldots \omega_{N}^{-(N-1)}\right)^{T}$. By writing out the $N$ equations from part (i), deduce that $\operatorname{FFT}(\boldsymbol{f}, N)$ can be written recursively as
+
+$$
+F F T(\boldsymbol{f}, N)=\binom{F F T\left(\boldsymbol{f}_{\text {even }}, \frac{N}{2}\right)}{F F T\left(\boldsymbol{f}_{\text {even }}, \frac{N}{2}\right)}+\boldsymbol{\omega} \odot\binom{F F T\left(\boldsymbol{f}_{\text {odd }}, \frac{N}{2}\right)}{F F T\left(\boldsymbol{f}_{\text {odd }}, \frac{N}{2}\right)}
+$$
+
+where $\odot$ denotes element-wise multiplication and $\boldsymbol{f}_{\text {even }} / \boldsymbol{f}_{\text {odd }}$ denotes the even/odd components of $\boldsymbol{f}$. Using this, write a recursive pseudocode for the function $F F T$ to compute the DFT of $\boldsymbol{f}$.\\
+(iii) Let $T(N)$ be the FLOPs to compute $F F T(\boldsymbol{f}, N)$ and assume $T(1)$ is a constant $C$. Express $T(N)$ as a recursive function of $T(N / 2)$ and show that the overall computational cost to compute $F F T(\boldsymbol{f}, N)$ is $\mathcal{O}\left(N \log _{2} N\right)$. How much faster is FFT compared to DFT using direct matrix-to-vector multiplication for $m=5,10,15,20$ ?\\
+Remark: FFT was considered one of top 10 most impactful algorithm of $20^{\text {th }}$ century - see https: // archive. siam. org/pdf/news/637. pdf.
+
+\section*{Q4. Numerical Differentiation and Integration}
+(a) In solving boundary value problems with Neumann boundary conditions, derivative values at the boundary need to be approximated from one side of the boundary. For some constants $a, b, c$, design an one-sided finite difference approximation for $f^{\prime}(x)$ of the form,
+
+$$
+D_{h} f(x)=a f(x)+b f(x+h)+c f(x+2 h),
+$$
+
+with the highest degree of accuracy. Derive its error term and find the highest $p$ so that the error is bounded by $\mathcal{O}\left(h^{p}\right)$.\\
+(b) Consider integrating $f(x)=e^{-x^{2}}$ which often arises in probability and statistics for computing the cumulative distribution function of the Gaussian distribution.\\
+(i) Write down the quadrature formulas involving $h$ and $n$ for $I(f)=\int_{a}^{b} f(x) d x$ using the composite midpoint, trapezoidal and Simpson's method. State their degree of accuracy.\\
+(ii) Recall the error for each of the composite rules is bounded by $\frac{M_{2}}{24}(b-a) h^{2}, \frac{M_{2}}{12}(b-a) h^{2}$, and $\frac{M_{4}}{180}(b-a) h^{4}$ respectively, where $M_{n}:=\max _{x \in[a, b]}\left|f^{(n)}(x)\right|$. Estimate the number of subintervals $n$ needed for each method in order to guarantee an error tolerance of $10^{-6}$ for $I(f)$ on $[0,1]$. How do these estimates compare to part (iv)?\\
+(iii) The 4-point Gauss Quadrature has Gauss points on $\left\{ \pm \sqrt{\frac{3}{7}-\frac{2}{7} \sqrt{\frac{6}{5}}}, \pm \sqrt{\frac{3}{7}+\frac{2}{7} \sqrt{\frac{6}{5}}}\right\}$ with respective weights $\left\{\frac{18+\sqrt{30}}{36}, \frac{18+\sqrt{30}}{36}, \frac{18-\sqrt{30}}{36}, \frac{18-\sqrt{30}}{36}\right\}$. Write down the 4 -point Gauss Quadrature of $I(f)$ on $[0,1]$.\\
+(iv) Using parts (i)-(iii), implement a program to generate a table of values for the four quadrature methods to reach the tolerance criterion of $10^{-5}$. Using the exact value of $I(f)$ on $[0,1]$ is $0.7468241328 \ldots$, verify the three composite methods have the expected error of order $\mathcal{O}\left(h^{p}\right)$, i.e. graph a log-log plot of error versus $h$ to verify the order $p$. Rank their computational costs based on their number of function evaluations.\\
+(c) Recall the composite Trapezoidal rule has the error $I(f)=I_{h}(f)+\mathcal{O}\left(h^{2}\right)$.\\
+(i) Apply Richardson's extrapolation to the composite Trapezoidal rule to derive a more accurate quadrature formula. What is the expected improved order?\\
+(ii) Demonstrate the improved convergence with your new quadrature rule for the integral from part (b) by graphing a log-log plot of error versus $h$ to verify the order $p$. Explain briefly if you do not get the expected order.
+
+
+\end{document}

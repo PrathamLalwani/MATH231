@@ -30,7 +30,8 @@
 \usepackage{chngcntr}
 \usepackage{tikz}
 \usepackage{titletoc}
-\newcommand\mycommfont[1]{\textit{\textcolor{darkgray}{#1}}}
+
+\newcommand\mycommfont[1]{\footnotesize\ttfamily\textcolor{blue}{#1}}
 \newcommand\myfunfont[1]{\ttfamily\textcolor{blue}{#1}}
 \SetCommentSty{mycommfont}
 \newcommand{\incfig}[1]{%
@@ -45,9 +46,6 @@
 \SetKwIF{If}{ElseIf}{Else}{\myfunfont{if}}{:}{\myfunfont{elif}}{\myfunfont{else}:}{}%
 \SetKwFor{While}{\myfunfont{while}}{:}{\myfunfont{end}}%
 \SetKw{Return}{\myfunfont{return}}
-\newcommand{\forcond}{$i=0$ \KwTo $n$}
-\renewcommand{\forcond}{$i$ \KwTo\Range{$n$}}
-\AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
 \usepackage{tikzsymbols}
 \tikzset{
 	symbol/.style={

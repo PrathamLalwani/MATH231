@@ -1,0 +1,442 @@
+\documentclass{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[english]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{enumitem}
+\usepackage{bm}
+% figure support
+\usepackage{import}
+\usepackage{xifthen}
+\pdfminorversion=7
+\usepackage{pdfpages}
+\usepackage{transparent}
+
+% \newcommand{\incfig}[1]{%
+% 	\def\svgwidth{\columnwidth}
+% 	\import{./figures/}{#1.pdf_tex}
+% }
+\pdfsuppresswarningpagegroup=1
+
+\input{preamble}
+\input{macros}
+\input{letterfonts}
+\title{\Huge{MATH 231 : Numerical ODEs}}
+\author{\huge{Pratham Lalwani}}
+\date{\today}
+
+
+
+\begin{document}
+\maketitle
+\newpage
+
+\pdfbookmark[section]{\contentsname}{toc}
+\tableofcontents
+\pagebreak
+\qs{Polynomial Interpolation}{
+
+	\begin{enumerate}[label=(\alph*)]
+		\item Consider the data $\{(-1,-5),(0,1),(1,3)\}$. This exercise is to compute by hand the Lagrange interpolant $f_{n}(x)$.\\
+		      \begin{enumerate}[label=(\roman*)]
+			      \item Compute $f_{2}(x)$ by hand using Newton basis functions and verify it interpolates the data.\\
+			      \item Suppose a new data point $(2,7)$ is added, repeat (i) and verify $f_{3}(x)$ interpolates the data.\\
+		      \end{enumerate}
+		\item Instead, suppose you have derivative information on the data $\{(-1,-5,4),(0,1,1),(2,7,121)\}$, compute by hand the Hermite interpolant $H_{5}(x)$ and verify that it interpolates the data.\\
+		\item Recall for $n+1$ data points $\left\{\left(x_{i}, y_{i}\right)\right\}_{i=0}^{n}$, the Lagrange interpolant written in terms of Lagrange basis is given by
+		      \begin{equation}
+			      f_{n}(x)=\sum_{j=0}^{n} y_{j} \ell_{j}(x), \quad \text { where } \ell_{j}(x)=\frac{\prod_{j \neq i=0}^{n}\left(x-x_{i}\right)}{\prod_{j \neq i=0}^{n}\left(x_{j}-x_{i}\right)} . \label{one}
+		      \end{equation}
+
+
+		      This exercise is about evaluating $f_{n}(x)$ more efficiently on many different values of $x$, such as when plotting $f_{n}(x)$.\\
+		      \begin{enumerate}[label=(\roman*)]
+			      \item Show that evaluating $f_{n}(x)$ at a fixed value of $x$ using (1) directly involves $\mathcal{O}\left(n^{2}\right)$ costs.\\
+			      \item Instead, deduce that \ref{one} can be rewritten as
+
+
+			            \begin{equation*}
+				            f_{n}(x)=\ell(x) \sum_{j=0}^{n} y_{j} \frac{w_{j}}{x-x_{j}}, \text { where } \ell(x)=\prod_{i=0}^{n}\left(x-x_{i}\right) \text { and } w_{j}=\left(\ell^{\prime}\left(x_{j}\right)\right)^{-1}=\left(\prod_{j \neq i=0}^{n}\left(x_{j}-x_{i}\right)\right)^{-1} . \tag{2}
+			            \end{equation*}
+
+
+			      \item Show that computing $\left\{w_{j}\right\}_{j=0}^{n}$ takes $\mathcal{O}\left(n^{2}\right)$ costs but it needs to be done only once for different values $x$.
+
+			            Hint: Unlike the expressions for $\ell_{j}(x)$, notice that $w_{j}$ only depends the nodes $\left\{x_{j}\right\}_{j=0}^{n}$.\\
+			      \item To further remove the need to compute $\ell(x)$, use (2) to deduce that (1) can be rewritten as
+
+
+			            \begin{equation*}
+				            f_{n}(x)=\left(\sum_{j=0}^{n} y_{j} \frac{w_{j}}{x-x_{j}}\right) /\left(\sum_{j=0}^{n} \frac{w_{j}}{x-x_{j}}\right) \tag{3}
+			            \end{equation*}
+
+
+			            This is also called the barycentric interpolation formula for $f_{n}(x)$.\\
+			            Hint: Recall $f_{n}(x)=f(x)$ for any polynomial function $f(x)$ up to degree $n$, in particular for $f(x)=1$.\\
+			      \item Conclude that once $\left\{w_{j}\right\}_{j=0}^{n}$ is computed and stored, evaluating $f_{n}(x)$ using (3) takes $\mathcal{O}(n)$ costs for each $x$.\\
+			      \item Implement a program to interpolate $f(x)=\sin ^{3}(\pi x)$ on $[-1,1]$ using $n=5,10,15,20$ uniformly-spaced nodes and plot resulting interpolants $f_{n}(x)$ versus $f(x)$ on 100 uniformly-spaced nodes using (3).\\
+			            Hint: When evaluating $f_{n}\left(x_{i}\right)$ with (3), replace any NaN's in your output with $f\left(x_{i}\right)$.
+
+		      \end{enumerate}
+	\end{enumerate}
+}
+\begin{solution}
+	\begin{enumerate}[label=(\alph*)]
+		\item
+		      \begin{enumerate}[label=(\roman*)]
+			      \item First we compute the secant slopes as they will give us the coefficients for the Newton Polynomial
+			            \[
+				            \begin{array}{c|ccc}
+					            1  & f[x_i] & f[x_i, x_{i+1}] & f[x_i, x_{i+1},x_{i+2}] \\
+					            \hline
+					            -1 & -5     &                 &                         \\
+					               &        & 6               &                         \\
+					            0  & 1      &                 & -2                      \\
+					               &        & 2               &                         \\
+					            1  & 3      &                 &
+				            \end{array}
+			            \].
+			            Therefore, the corresponding Newton Polynomial is :
+			            \begin{align*}
+				            f_2(x) & = f[x_0]+ f[x_0,x_1](x-x_0) + f[x_0,x_1,x_2](x-x_0)(x-x_1) \\
+				                   & = -5+6(x+1) -2(x+1)(x) \\
+				                   & = -5 + 6x + 6 -2x^{2} - 2x \\
+				                   & =  1 + 4x -2x^2
+				            .\end{align*}
+			      \item We update our previous secant table by adding the point:
+			            \[
+				            \begin{array}{c|cccc}
+					            1  & f[x_i] & f[x_i, x_{i+1}] & f[x_i, x_{i+1},x_{i+2}] & f[x_i, x_{i+1},x_{i+2},x_{i+3}] \\
+					            \hline
+					            -1 & -5     &                 &                         &                                 \\
+					               &        & 6               &                         &                                 \\
+					            0  & 1      &                 & -2                      &                                 \\
+					               &        & 2               &                         & 1                               \\
+					            1  & 3      &                 & 1                       &                                 \\
+					               &        & 4               &                         &                                 \\
+					            2  & 7      &                 &                         &
+				            \end{array}
+			            \].
+			            Therefore the corresponding Newton polynomial is,
+			            \begin{align*}
+				            f_3(x)= f_2(x) + f[x_0,x_1,x_2,x_3](x-x_0)(x-x_1)(x-x_2) \\
+				             & = 1 + 4x -2x^2 + (x+1)x(x-1) \\
+				             & = 1 + 4x -2x^2 + x^3 -x \\
+				             & = 1 + 3x -2x^2 + x^3 \\
+			            \end{align*}
+		      \end{enumerate}
+		\item
+		\item 	\phantom{}\\
+		      \begin{algorithm}[H]
+			      \Fn{\FuncSty{NaivePolynomialEval(}{$a$,$x$,$\bm x$, $y$ }\FuncSty{)}}{
+				      \KwIn{\\$a$: The array of coefficients \\  $x$: Point of evaluation}
+				      \KwOut{\\sum: Polynomial evaluation}
+				      \SetAlgoLined
+				      \SetNoFillComment
+				      \vspace{3mm}
+				      s = 0\\
+				      n = len(a)\\
+				      \For{j=0 \dots n}{
+					      $l_i$=1\\
+					      \For{j= 1\dots n}{
+						      \If{$i \neq j$}{
+							      $l_i = l_{i} \cdot  \frac{x- x_{j}}{x_{i} - x_{j}}$\\
+						      }
+					      }
+					      sum = $y_i \cdot l_{i}$
+				      }
+				      return sum
+				      \caption{Richardson Iteration}
+			      }
+		      \end{algorithm}
+		      From the above we can see that it takes $\mathcal{O}\left( n^2 \right) $ to evaluate a polynomial.
+	\end{enumerate}
+\end{solution}
+\qs{Spline Interpolation}{
+
+	\begin{enumerate}[label=(\alph*)]
+
+		\item Compute the constant, linear, natural cubic spline by hand for the data $\{(1,2),(2,3),(3,5)\}$.\\
+		\item Implement an $\mathcal{O}(n)$ program to interpolate $f(x)=\cos \left(x^{2}\right)$ with a clamped cubic spline $S(x)$ using $n=5,10,15,20$ uniformly-spaced nodes on $[0,2 \sqrt{\pi}]$ and plot resulting interpolants $S_{n} \overline{(x)}$ versus $f(x)$ on 100 uniformly-spaced nodes. Hint: Use your $\mathcal{O}(n)$ algorithm from $\mathbf{A 0}$ to solve the tridiagonal system for the coefficients $c_{i}$ and use Horner's method to evaluate the piecewise cubic polynomials for plotting.\\
+		\item Consider interpolating $f$ using a not-a-knot cubic spline on $a=x_{0}<x_{1}<\cdots<x_{n-1}<x_{n}=b$ (not necessarily uniformly spaced). Write down the linear system for determining the coefficients $c_{i}$ in the form
+
+		      $$
+			      A \boldsymbol{c}=\boldsymbol{f}
+		      $$
+
+		      where $A$ is a tridiagonal matrix of $(n-1) \times(n-1), \boldsymbol{c} \in \mathbb{R}^{n-1}$ is the vector of $c_{i}$ coefficients, and $\boldsymbol{f} \in \mathbb{R}^{n-1}$ is the vector involving divided difference of $f$.\\
+		      Hint: Show that the not-a-knot boundary condition implies $d_{0}=d_{1}$ and $d_{n-1}=d_{n-2}$. Use these relations to deduce relations for $c_{0}$ and $c_{n}$ by substituting them into the boxed formula on Lecture 15-page 12.
+
+	\end{enumerate}
+}
+\begin{solution}
+	\begin{enumerate}[label=(\alph*)]
+		\item The constant spline is,
+		      \[
+			      S\left( x \right)  = \begin{cases}
+				      2 , \quad x\in[1,2) \\
+				      3,\quad x\in[2,3)   \\
+				      5,\quad x= 3
+			      \end{cases}
+			      .\]
+		      The linear spline is,
+		      \[
+			      S\left( x \right)  =  \begin{cases}
+				      y_0+ f[x_0,x_1](x-1), \quad x\in[1,2) \\
+				      y_1 + f[x_1,x_2](x-1),\quad x\in[2,3] \\
+			      \end{cases}
+			      = \begin{cases}
+				      2+ (x-1) , \quad x\in[1,2)   \\
+				      3 + 2(x-2) , \quad x\in[2,3] \\
+			      \end{cases}
+			      .\]
+		      The cubic spline has the following form ,
+		      \[
+			      S(x) = \begin{cases}
+				      a_{i}+b_{i}(x-x_{i}) + c_{i}(x-x_{i})^{2} + d_{i}(x-1)^3 , \quad x\in[x_{i},x_{i+1})            \\
+				      a_{n-1}+b_{n-1}(x-x_{n-1})+c_{n-1}(x-x_{n-1})^2+d_{n-1}(x-x_{n-1})^3, \quad x\in[x_{n-1},x_{n}] \\
+			      \end{cases}
+			      .\]
+		      To solve for the natural cubic spline we have to solve the following equation first,
+		      \begin{align*}
+			      \begin{pmatrix}
+				      2(h_0+h_1) \\
+			      \end{pmatrix} \begin{pmatrix} c_1  \end{pmatrix} & =  3\left( f[x_1,x_2] - f[x_0,x_1] \right) \\
+			      \begin{pmatrix}
+				      4 \\
+			      \end{pmatrix} \begin{pmatrix} c_1  \end{pmatrix} & =  3\left( f[x_1,x_2] - f[x_0,x_1] \right) \\
+			      4c_1                                             & =   3(2-1) \\
+			      c_1                                              & =   \frac{3}{4}
+			      .\end{align*}
+		      So we have, $c_0 =c_2 =0$ and $c_1=\frac{3}{4}$.
+		      The corresponding $d_i$ are,
+		      \[
+			      d_0 = \frac{c_1-c_0}{3h_{0}} = \frac{\frac{3}{4}}{3} = \frac{1}{4}
+		      \]
+		      \[
+			      d_1 = \frac{c_2-c_1}{3h_{1}} = \frac{-\frac{3}{4}}{1} = -\frac{1}{4}
+			      .\]
+		      Next we compute the $b_{i}$,
+		      \[
+			      b_{0} = f[x_{0},x_1] - \frac{h_{0}}{3} \left( c_1+2c_0 \right) = 1- \frac{1}{3} \left(\frac{3}{4}  \right) =\frac{3}{4}
+		      \]
+		      \[
+			      b_{1} = f[x_{1},x_2] - \frac{h_{1}}{3} \left( c_2+2c_1 \right) = 2- \frac{1}{3} \left(\frac{6}{4}  \right) =\frac{3}{2}
+			      .    \]
+		      So the corresponding natural cubic spline is,
+		      \[
+			      S(x)=  \begin{cases}
+				      2+\frac{3}{4}(x-1) + \frac{3}{4}(x-1)^3 , \quad x\in[1,2)                 \\
+				      3+\frac{3}{2}(x-2)+\frac{3}{4}(x-2)^2-\frac{1}{4}(x-2)^3, \quad x\in[2,3] \\
+			      \end{cases}
+			      .\]
+		\item In jupyter notebook.
+		\item The \emph{\bfseries not-a-knot} cubic spline condition is,
+		      \[
+			      p_0'''(x_0) = p_1'''(x_1) \quad \text{and} \quad p_{n-2}'''(x_{n-1}) = p_{n-1}'''(x_{n-1})
+		      \]
+		      \[
+			      p_0'''(x_0) = d_0 = d_1 = p_1'''(x_1) \quad \text{and} \quad p_{n-1}'''(x_{n-1}) = d_{n-1} = d_{n-2} = p_{n-2}''' (x-1)
+			      . \]
+		      Using the above in the relations derived between $c_{i}$ and $d_{i}$, we get
+		      \[
+			      d_0 = \frac{c_1-c_0}{3h_{0}} = \frac{c_{2}-c_{1}}{3h_{1}} = d_{1}
+			      .\]
+		      Simplifying gives,
+		      \[
+			      -c_{0}h_1 + (h_0+h_1)c_{1} -c_{2}h_{1} = 0
+			      .\]
+		      On the other hand,
+		      \[
+			      d_{n-1} = \frac{c_{n} - c_{n-1}}{3h_{n-1}} = \frac{c_{n-2}-c_{n-1}}{3h_{n-2}} = d_{n-2}
+			      .\]
+		      Simplifying the above gives,
+		      \[
+			      -c_{n-2}h_{n-1} + (h_{n-1}+h_{n-2})c_{n-1} -c_{n}h_{n-2} = 0
+			      .\]
+		      Which gives the following linear system,
+		      \[
+			      A = \begin{pmatrix}
+				      -h_1 & (h_0+h_1) & h_0      &                     & 0       \\
+				      h_0  & (h_0+h_1) & h_1      &                     &         \\
+				           &           &          & \ddots              &         \\
+				           &           & h_{n-2}  & 2(h_{n-2} +h_{n-1}) & h_{n-1} \\
+				           &           & -h_{n-1} & 2(h_{n-2} +h_{n-1}) & h_{n-2} \\
+			      \end{pmatrix}
+			      .\]
+		      \[
+			      \vec{{c}} =  \begin{pmatrix} c_0\\ \vdots\\ c_n \end{pmatrix}
+			      .\]
+	\end{enumerate}
+\end{solution}
+\qs{Trigonometric interpolation and Discrete Fourier Transform}{
+	Denote the vectors $\boldsymbol{f}=\left(f_{0}, f_{1}, \ldots, f_{N-1}\right)^{T}$ and $\hat{\boldsymbol{f}}=\left(\hat{f}_{0}, \hat{f}_{1}, \ldots, \hat{f}_{N-1}\right)^{T}$. Recall that the Discrete Fourier Transform (DFT) of $\boldsymbol{f}$ is $\hat{\boldsymbol{f}}$ and the inverse Discrete Fourier Transform of $\hat{\boldsymbol{f}}$ is $\boldsymbol{f}$ given by in components
+
+
+	\begin{equation*}
+		\hat{f}_{k}=\sum_{j=0}^{N-1} f_{j} \omega_{N}^{-j k}, \quad f_{j}=\frac{1}{N} \sum_{k=0}^{N-1} \hat{f}_{k} \omega_{N}^{j k}, \quad \text { where } \omega_{N}:=e^{\frac{2 \pi i}{N}}, \text { for } 0 \leq k \leq N-1 \tag{4}
+	\end{equation*}
+	\begin{enumerate}[label=(\alph*)]
+
+		\item Compute explicitly the DFT $\hat{\boldsymbol{f}}$ of $\boldsymbol{f}=(5,1,5,1,5,1,5,1)^{T}$ using (4). Sketch the associated truncated Fourier series $f_{N}(x)$ on $[0,2 \pi]$ ?\\
+		\item Set all frequency components $\hat{f}_{4}, \ldots, \hat{f}_{7}$ of $\hat{\boldsymbol{f}}$ to zero and call this vector $\tilde{\boldsymbol{f}}$. Now compute the inverse DFT of $\tilde{\boldsymbol{f}}$ and sketch the new truncated Fourier series $\tilde{f}_{N}(x)$ ? Explain why this result is expected.\\
+		      Remark: This is an example of a "low-pass" filter and has applications in signal processing.\\
+		\item The following exercise outlines the main idea behind the Fast Fourier Transform (FFT) algorithm introduced by Cooley and Tukey in 1965. For simplicity, we assume $N=2^{m}$ for some integer $m$.\\
+		      \begin{enumerate}[label=(\roman*)]
+
+			      \item For $0 \leq k \leq N-1$, show that the sum in (4) of the DFT can be written in terms of even/odd components as
+
+			            $$
+				            \hat{f}_{k}=\sum_{j=0}^{\frac{N}{2}-1} f_{2 j}\left(\omega_{\frac{N}{2}}\right)^{-j k}+\omega_{N}^{-k} \sum_{j=0}^{\frac{N}{2}-1} f_{2 j+1}\left(\omega_{\frac{N}{2}}\right)^{-j k}
+			            $$
+
+			            Hint: Express $\omega_{\frac{N}{2}}$ in terms of $\omega_{N}$.\\
+			      \item Denote $F F T(\boldsymbol{f}, N)$ as the DFT of $\boldsymbol{f}$ with $N$ components and define $\boldsymbol{\omega}:=\left(1, \omega_{N}^{-1}, \omega_{N}^{-2} \ldots \omega_{N}^{-(N-1)}\right)^{T}$. By writing out the $N$ equations from part (i), deduce that $\operatorname{FFT}(\boldsymbol{f}, N)$ can be written recursively as
+
+			            $$
+				            F F T(\boldsymbol{f}, N)=\binom{F F T\left(\boldsymbol{f}_{\text {even }}, \frac{N}{2}\right)}{F F T\left(\boldsymbol{f}_{\text {even }}, \frac{N}{2}\right)}+\boldsymbol{\omega} \odot\binom{F F T\left(\boldsymbol{f}_{\text {odd }}, \frac{N}{2}\right)}{F F T\left(\boldsymbol{f}_{\text {odd }}, \frac{N}{2}\right)}
+			            $$
+
+			            where $\odot$ denotes element-wise multiplication and $\boldsymbol{f}_{\text {even }} / \boldsymbol{f}_{\text {odd }}$ denotes the even/odd components of $\boldsymbol{f}$. Using this, write a recursive pseudocode for the function $F F T$ to compute the DFT of $\boldsymbol{f}$.\\
+			      \item Let $T(N)$ be the FLOPs to compute $F F T(\boldsymbol{f}, N)$ and assume $T(1)$ is a constant $C$. Express $T(N)$ as a recursive function of $T(N / 2)$ and show that the overall computational cost to compute $F F T(\boldsymbol{f}, N)$ is $\mathcal{O}\left(N \log _{2} N\right)$. How much faster is FFT compared to DFT using direct matrix-to-vector multiplication for $m=5,10,15,20$ ?\\
+			            Remark: FFT was considered one of top 10 most impactful algorithm of $20^{\text {th }}$ century - see https: // archive. siam. org/pdf/news/637. pdf.
+		      \end{enumerate}
+	\end{enumerate}
+}
+\begin{solution}
+	\begin{enumerate}[label=(\alph*)]
+		\item  Given that $\bm f = \left(5,1,5,1,5,1,5,1\right) $ we want to compute $\hat{\bm f} $
+		      \begin{align*}
+			      \hat{f}_0 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{7}}\right)^{0} = 24 \\
+			      \hat{f}_1 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-j} \\
+			                & =   5 + e^{\frac{-2\pi i}{8}} + 5e^{\frac{-4\pi i }{8}} + e^{\frac{-6\pi i }{8}} +5 e^{\frac{-8\pi i }{8}}
+			      + e^{\frac{-10\pi i}{8}} + 5e^{\frac{-12\pi i}{8}} + e^{\frac{-14\pi i}{8}} \\
+			                & =  5 + e^{\frac{-\pi i}{4}} + 5 e^{\frac{-\pi i }{2}} + e^{\frac{-3\pi i }{4}} -5
+			      - e^{\frac{-\pi i}{4}} - 5e^{\frac{-\pi i}{2}} - e^{\frac{-3\pi i}{4}} \\
+			                & = 0 \\
+			      \hat{f}_2 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-2j} \\
+			                & =   5 + e^{\frac{-4\pi i}{8}} + 5e^{\frac{-8\pi i }{8}} + e^{\frac{-12\pi i }{8}} +5 e^{\frac{-16\pi i }{8}}
+			      + e^{\frac{-20\pi i}{8}} + 5e^{\frac{-24\pi i}{8}} + e^{\frac{-28\pi i}{8}} \\
+			                & =  5 + e^{\frac{-\pi i}{2}} + 5 e^{-\pi i } + e^{\frac{-3\pi i }{2}} +5
+			      + e^{\frac{-5\pi i}{2}} + 5e^{-3\pi i} + e^{\frac{-7\pi i}{2}} \\
+			                & =  5 + e^{\frac{-\pi i}{2}} - 5  - e^{\frac{-\pi i }{2}} +5
+			      + e^{\frac{-\pi i}{2}} - 5 - e^{\frac{-\pi i}{2}} \\
+			                & = 0 \\
+			      \hat{f}_3 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-3j} \\
+			                & =   5 + e^{\frac{-3\pi i}{4}} + 5e^{\frac{-6\pi i }{4}} + e^{\frac{-9\pi i }{4}} +5 e^{\frac{-12\pi i }{4}}
+			      + e^{\frac{-15\pi i}{4}} + 5e^{\frac{-18\pi i}{4}} + e^{\frac{-21\pi i}{4}} \\
+			                & =  5 + e^{\frac{-3\pi i}{4}} - 5e^{\frac{-\pi i }{2}} + e^{\frac{-\pi i }{4}} -5
+			      - e^{\frac{-3\pi i}{4}} + 5e^{\frac{-\pi i}{2}} - e^{\frac{-\pi i}{4}} \\
+			                & =  0 \\
+			      \hat{f}_4 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-4j} \\
+			                & =   5 + e^{1\pi i} + 5e^{2\pi i} + e^{3\pi i} +5 e^{4\pi i}
+			      + e^{5\pi i} + 5e^{6\pi i} + e^{7\pi i} \\
+			                & =  5 - 1 + 5 - 1 +5 -1  + 5 -1 \\
+			                & =  16 \\
+			      \hat{f}_5 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-5j} \\
+			                & =   5 + e^{\frac{-5\pi i}{4}} + 5e^{\frac{-5\pi i }{2}} + e^{\frac{-15\pi i }{4}} +5 e^{-5\pi i }
+			      + e^{\frac{-25\pi i}{4}} + 5e^{\frac{-15\pi i}{2}} + e^{\frac{-35\pi i}{4}} \\
+			                & =  5 - e^{\frac{-\pi i}{4}} + 5e^{\frac{-\pi i }{2}} + e^{\frac{-\pi i }{4}} -5
+			      - e^{\frac{-3\pi i}{4}} + 5e^{\frac{-\pi i}{2}} - e^{\frac{-\pi i}{4}} \\
+			                & =  0 \\
+		      \end{align*}
+	\end{enumerate}
+\end{solution}
+
+\qs{Numerical Differentiation and Integration}{
+	\begin{enumerate}[label=(\alph*)]
+		\item In solving boundary value problems with Neumann boundary conditions, derivative values at the boundary need to be approximated from one side of the boundary. For some constants $a, b, c$, design an one-sided finite difference approximation for $f^{\prime}(x)$ of the form,
+
+		      $$
+			      D_{h} f(x)=a f(x)+b f(x+h)+c f(x+2 h),
+		      $$
+
+		      with the highest degree of accuracy. Derive its error term and find the highest $p$ so that the error is bounded by $\mathcal{O}\left(h^{p}\right)$.\\
+		\item Consider integrating $f(x)=e^{-x^{2}}$ which often arises in probability and statistics for computing the cumulative distribution function of the Gaussian distribution.\\
+		      \begin{enumerate}[label=(\roman*)]
+			      \item Write down the quadrature formulas involving $h$ and $n$ for $I(f)=\int_{a}^{b} f(x) d x$ using the composite midpoint, trapezoidal and Simpson's method. State their degree of accuracy.\\
+			      \item Recall the error for each of the composite rules is bounded by $\frac{M_{2}}{24}(b-a) h^{2}, \frac{M_{2}}{12}(b-a) h^{2}$, and $\frac{M_{4}}{180}(b-a) h^{4}$ respectively, where $M_{n}:=\max _{x \in[a, b]}\left|f^{(n)}(x)\right|$. Estimate the number of subintervals $n$ needed for each method in order to guarantee an error tolerance of $10^{-6}$ for $I(f)$ on $[0,1]$. How do these estimates compare to part (iv)?\\
+			      \item The 4-point Gauss Quadrature has Gauss points on $\left\{ \pm \sqrt{\frac{3}{7}-\frac{2}{7} \sqrt{\frac{6}{5}}}, \pm \sqrt{\frac{3}{7}+\frac{2}{7} \sqrt{\frac{6}{5}}}\right\}$ with respective weights $\left\{\frac{18+\sqrt{30}}{36}, \frac{18+\sqrt{30}}{36}, \frac{18-\sqrt{30}}{36}, \frac{18-\sqrt{30}}{36}\right\}$. Write down the 4 -point Gauss Quadrature of $I(f)$ on $[0,1]$.\\
+			      \item Using parts (i)-(iii), implement a program to generate a table of values for the four quadrature methods to reach the tolerance criterion of $10^{-5}$. Using the exact value of $I(f)$ on $[0,1]$ is $0.7468241328 \ldots$, verify the three composite methods have the expected error of order $\mathcal{O}\left(h^{p}\right)$, i.e. graph a log-log plot of error versus $h$ to verify the order $p$. Rank their computational costs based on their number of function evaluations.\\
+		      \end{enumerate}
+		\item Recall the composite Trapezoidal rule has the error $I(f)=I_{h}(f)+\mathcal{O}\left(h^{2}\right)$.\\
+		      \begin{enumerate}[label=(\roman*)]
+			      \item Apply Richardson's extrapolation to the composite Trapezoidal rule to derive a more accurate quadrature formula. What is the expected improved order?\\
+			      \item Demonstrate the improved convergence with your new quadrature rule for the integral from part (b) by graphing a log-log plot of error versus $h$ to verify the order $p$. Explain briefly if you do not get the expected order.
+		      \end{enumerate}
+
+	\end{enumerate}
+}
+\begin{solution}
+	\begin{enumerate}[label=(\alph*)]
+		\item Because we have three unknowns $a,b,c$ we can have 3 equations and hence highest degree of accuracy we can achieve is 2. Therefore consider,
+
+		      $	\text{If } f(x)=1$,
+		      \[
+			      D_h f(x) = f'(x) = 0= a +b +c
+			      .\]
+		      If $f(x) = x$
+		      \[
+			      D_h f(x)= f'(x) = 1 = ax + b(x+h)+c(x+2h)
+			      .\]
+		      \[
+			      \implies 1 = (a+b+c)x + (b+2c)h = (b+2c)h \implies \frac{1}{h} = b+2c
+			      .\]
+		      If $f(x) = x^2$
+		      \[
+			      D_h f(x) = f'(x) = 2x = ax^2 + b(x+h)^2+c(x+2h)^2
+			      .\]
+		      \[
+			      \implies 2x = (a+b+c)x^2 + 2(b+2c)xh+ (b+4c)h^2 = 2x+(b+4c)h^2
+			      .\]
+		      \[
+			      \implies 0 = b+4c = \frac{1}{h} + 2c \implies \frac{-1}{2h} = c
+			      .\]
+		      Also,
+		      \[
+			      0 = b+4c = \frac{2}{h} - b \implies b = \frac{2}{h}
+			      .\]
+		      Combining gives,
+		      \[
+			      a = \frac{-3}{2h}
+			      .\]
+		      Therefore,
+		      \[
+			      D_h f(x) = \frac{-3f(x) + 4f(x+h) -f(x+2h)}{2h}
+			      .\]
+		      Which has degree order of accuracy of 2.
+
+		      Using the Taylor Remainder Theorem around $x$ gives,
+		      \begin{align*}
+			      D_{h}f(x)                       & =
+			      \frac{1}{2h} \left( -3f(x) + 4f(x) + 4 f'(x) h + 2f''(x)h^2 + \frac{2f'''(\xi_1)h^3}{3} \right. \\
+			                                      & \hspace{2cm} \left. - f\left( x \right) - 2f'(x)h - 2f''(x) h^2  -   \frac{4f'''(\xi_2)h^3}{3} +  \mathcal{O}(h^4) \right) \\
+			                                      & = \frac{1}{2h} \left(2f'(x)h-\frac{2}{3} \left( f'''(\xi_1) - 2f(\xi_2)) \right) h^3 + \mathcal{O}(h^{4}) \right) \\
+			      |D_{h}f\left(x \right) - f'(x)| & = \left|\frac{1}{3} (f'''(\xi_1) - f'''(\xi_2))h^2 + \mathcal{O}(h^{3})\right|\le \frac{2}{3} \underset{\xi\in[x,x+2h]}{\operatorname{max}} f'''\left( \xi \right) h^2 + \mathcal{O}(h^3)
+			      .\end{align*}
+		\item
+		      \begin{enumerate}[label=(\roman*)]
+			      \item Doing the integral using the mid-point rule we get,
+			            \[
+				            I(f) \approx I_\text{mid-point}(f) = \sum_{i=1}^{n} f\left(a+ih-\frac{h}{2}\right) h
+				            .\]
+			            \[
+							I(f) \approx \sum_{i=1}^{n} \exp\left(\left(a+ih-\frac{h}{2}\right)^{2}\right) h
+			            \]
+
+			            Doing the integral using the trapezoidal rule we get,
+			            \[
+				            I(f) \approx I_\text{trapezoidal}(f) = h\left(\frac{f(a)}{2} +  \sum_{i=1}^{n} f\left(a+ih\right) + \frac{f(b)}{2}\right)
+				            .\]
+
+			            Doing the integral using the simpsons rule we get,
+			            \[
+				            I(f) \approx I_\text{simpson}(f) = \frac{h}{3}\left(\frac{f(a)}{2} + 4 \sum_{i=1}^{\frac{n}{2}} f\left(a+(2i-1)h\right)+2 \sum_{i=1}^{\frac{n}{2}-1} f\left(a+2ih\right)  + \frac{f(b)}{2}\right)
+				            .\]
+			      \item
+		      \end{enumerate}
+	\end{enumerate}
+\end{solution}
+\end{document}

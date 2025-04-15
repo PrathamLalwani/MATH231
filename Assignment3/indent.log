@@ -1,12 +1,12 @@
 INFO:  latexindent version 3.24.4, 2024-07-18, a script to indent .tex files
        latexindent lives here: /usr/local/texlive/2024/texmf-dist/scripts/latexindent/
-       Mon Apr 14 13:18:45 2025
-       Filename: /home/pratham/School/Spring2025/MATH231/Assignment2/preamble.tex
+       Mon Apr 14 17:09:29 2025
+       Filename: /home/pratham/School/Spring2025/MATH231/Assignment3/main.tex
 INFO:  Processing switches:
        -s|--silent: Silent mode active (you have used either -s or --silent)
        -w|--overwrite: Overwrite mode active, will make a back up before overwriting
 INFO:  Directory for backup files and log file indent.log:
-       /home/pratham/School/Spring2025/MATH231/Assignment2
+       /home/pratham/School/Spring2025/MATH231/Assignment3
 INFO:  YAML settings read: defaultSettings.yaml
        Reading defaultSettings.yaml from /usr/local/texlive/2024/texmf-dist/scripts/latexindent/defaultSettings.yaml
 INFO:  YAML reading settings
@@ -14,17 +14,17 @@ INFO:  YAML reading settings
        latexindent.pl didn't find indentconfig.yaml or .indentconfig.yaml
        see all possible locations: https://latexindentpl.readthedocs.io/en/latest/sec-appendices.html#indentconfig-options)
 INFO:  Backup procedure (-w flag active):
-       /home/pratham/School/Spring2025/MATH231/Assignment2/preamble.bak0 already exists, incrementing by 1 (see maxNumberOfBackUps)
-       /home/pratham/School/Spring2025/MATH231/Assignment2/preamble.bak1 already exists, incrementing by 1 (see maxNumberOfBackUps)
-       /home/pratham/School/Spring2025/MATH231/Assignment2/preamble.bak2 will be overwritten (maxNumberOfBackUps reached, see maxNumberOfBackUps)
-       Backing up /home/pratham/School/Spring2025/MATH231/Assignment2/preamble.tex to /home/pratham/School/Spring2025/MATH231/Assignment2/preamble.bak2...
-       /home/pratham/School/Spring2025/MATH231/Assignment2/preamble.tex will be overwritten after indentation
+       /home/pratham/School/Spring2025/MATH231/Assignment3/main.bak0 already exists, incrementing by 1 (see maxNumberOfBackUps)
+       /home/pratham/School/Spring2025/MATH231/Assignment3/main.bak1 already exists, incrementing by 1 (see maxNumberOfBackUps)
+       /home/pratham/School/Spring2025/MATH231/Assignment3/main.bak2 will be overwritten (maxNumberOfBackUps reached, see maxNumberOfBackUps)
+       Backing up /home/pratham/School/Spring2025/MATH231/Assignment3/main.tex to /home/pratham/School/Spring2025/MATH231/Assignment3/main.bak2...
+       /home/pratham/School/Spring2025/MATH231/Assignment3/main.tex will be overwritten after indentation
 INFO:  Phase 1: searching for objects
 INFO:  Phase 2: finding surrounding indentation
 INFO:  Phase 3: indenting objects
 INFO:  Phase 4: final indentation check
 INFO:  Output routine:
-       Overwriting file /home/pratham/School/Spring2025/MATH231/Assignment2/preamble.tex
+       Overwriting file /home/pratham/School/Spring2025/MATH231/Assignment3/main.tex
        --------------
 INFO:  Please direct all communication/issues to:
         https://github.com/cmhughes/latexindent.pl
