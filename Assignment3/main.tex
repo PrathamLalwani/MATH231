@@ -144,12 +144,23 @@
 				      5 & 2   & 7      &                         &                       &                               &                           &
 			      \end{array}
 		      \]
+		      Therefore, the corresponding Hermite polynomial is
+		      \[
+			      f(x) = -5 + 4(x+1) + 2(x+1)^2-7x(x+1)^2 + 3 x^2(x+1)^2 + 2x^2(x+1)^2(x-2)
+			      .\]
+		      Verification,
+		      \begin{align*}
+			      H_5(-1) & = -5 \qquad \checkmark \\
+			      H_5(0)  & = -5 + 4 +2 = 1 \qquad \checkmark \\
+			      H_5(2)  & = -5 + 12 +18 - 126+108 = 7 \qquad \checkmark \\
+		      \end{align*}
+		      The polynomial does interpolate the data.
 		\item 	\phantom{}\\
 		      \begin{enumerate}[label=(\roman*)]
 			      \item \phantom{}\\
 			            \begin{algorithm}[H]
-				            \Fn{\FuncSty{NaivePolynomialEval(}{$a$,$x$,$\bm x$,$y$}\FuncSty{)}}{
-					            \KwIn{\\$a$: The array of coefficients \\  $x$: Point of evaluation}
+				            \Fn{\FuncSty{NaivePolynomialEval(}{$x$,$\bm x$,$y$}\FuncSty{)}}{
+					            \KwIn{$x$: Point of evaluation\\$\bm x$: The array of coefficients \\$\bm y$ : The array of function values}
 					            \KwOut{\\sum: Polynomial evaluation}
 					            \SetAlgoLined
 					            \SetNoFillComment
@@ -169,7 +180,7 @@
 					            \caption{Naive Polynomial Interpolation}
 				            }
 			            \end{algorithm}
-			            From the above we can see that it takes $\mathcal{O}\left( n^2 \right) $ to evaluate a polynomial.
+			            From the above we can see that it takes $\mathcal{O}\left( n^2 \right) $ to evaluate a polynomial. Each for loop has nearly $n$ operators which would scale like $\mathcal{O}(n^2)$.
 			      \item \begin{align*}
 				            f_{n}(x) & = \sum_{j=0}^{n} y_j \ell_j(x) \\
 				                     & = \sum_{j=0}^{n} y_j \frac{\prod_{j\neq i=0}^n (x-x_{i})}{\prod_{j\neq i=0}^n (x_{j}-x_{i})} \\
@@ -179,29 +190,43 @@
 			            \end{align*}
 			      \item  	\phantom{}\\
 			            \begin{algorithm}[H]
-				            \Fn{\FuncSty{NaivePolynomialEval(}{$a$,$x$,$\bm x$,$y$}\FuncSty{)}}{
-					            \KwIn{\\$a$: The array of coefficients \\  $x$: Point of evaluation}
+				            \Fn{\FuncSty{computeLagrangeWeights(}{$\bm x$}\FuncSty{)}}{
+					            \KwIn{\\$\bm x$: The array of coefficients }
 					            \KwOut{\\sum: Polynomial evaluation}
 					            \SetAlgoLined
 					            \SetNoFillComment
 					            \vspace{3mm}
 					            s = 0\\
 					            n = len(a)\\
+					            w = zeros(n)
 					            \For{j=0 \dots n}{
-						            $l_i$=1\\
+						            $w_i$=1\\
 						            \For{j= 1\dots n}{
 							            \If{$i \neq j$}{
-								            $l_i = l_{i} \cdot  \frac{x- x_{j}}{x_{i} - x_{j}}$\\
+								            $w_i = w_{i} \cdot  \frac{1}{x_{i} - x_{j}}$\\
 							            }
 						            }
-						            sum = $y_i \cdot l_{i}$
 					            }
-					            return sum
-					            \caption{Richardson Iteration}
+					            return w
+					            \caption{Computing Lagrange Polynomial weights}
 				            }
 			            \end{algorithm}
-			            From the above we can see that it takes $\mathcal{O}\left( n^2 \right) $ to evaluate a polynomial.
-			      \item
+			            From the above we can see that it takes $\mathcal{O}\left( n^2 \right) $ to evaluate a polynomial. Each for loop has nearly $n$ operations which would scale like $\mathcal{O}(n^2)$. But it needs to be done only once because $w_j$ is independent of the input point $x$.
+			      \item The interpolant is exact for $f(x)=1$, therfore, if $f(x) = 1 \implies y_{i} = 1$ and we get,
+			            \begin{align*}
+				            1 = f\left(x \right) = f_n(x) & = \ell(x) \sum_{j=0}^{n} y_j \frac{w_j}{(x-x_{j})} \\
+				            1                             & =  \ell(x) \sum_{j=0}^{n} \frac{w_j}{(x-x_{j})} \\
+				            \ell(x) = \frac{1}{\displaystyle \sum_{j=0}^{n} \frac{w_{j}}{x-x_{j}}}
+				            .\end{align*}
+			            Substituting in the original equation gives,
+			            \[
+				            f_n(x) = \frac{\displaystyle \sum_{j=0}^{n} y_j \frac{w_j}{(x-x_{j})}}{{\displaystyle \sum_{j=0}^{n} \frac{w_{j}}{x-x_{j}}}
+				            }
+				            .\]
+			            Which is the desired result.
+			      \item If we have $\left\{w_j\right\}_{j=0}^n$, then computing  $f_n(x) = \frac{\displaystyle \sum_{j=0}^{n} y_j \frac{w_j}{(x-x_{j})}}{{\displaystyle \sum_{j=0}^{n} \frac{w_{j}}{x-x_{j}}}}$ has $ 2n$ subtractions and $3n$ multiplications which are $\mathcal{O}(n)$ operations.
+
+			      \item In jupyter notebook
 		      \end{enumerate}
 	\end{enumerate}
 \end{solution}
@@ -285,7 +310,7 @@
 		\item In jupyter notebook.
 		\item The \emph{\bfseries not-a-knot} cubic spline condition is,
 		      \[
-			      p_0'''(x_0) = p_1'''(x_1) \quad \text{and} \quad p_{n-2}'''(x_{n-1}) = p_{n-1}'''(x_{n-1})
+			      p_0'''(x_1) = p_1'''(x_1) \quad \text{and} \quad p_{n-2}'''(x_{n-1}) = p_{n-1}'''(x_{n-1})
 		      \]
 		      \[
 			      p_0'''(x_0) = d_0 = d_1 = p_1'''(x_1) \quad \text{and} \quad p_{n-1}'''(x_{n-1}) = d_{n-1} = d_{n-2} = p_{n-2}''' (x-1)
@@ -296,7 +321,15 @@
 			      .\]
 		      Simplifying gives,
 		      \[
-			      -c_{0}h_1 + (h_0+h_1)c_{1} -c_{2}h_{1} = 0
+			      -c_{0}h_1 + (h_0+h_1)c_{1} -c_{2}h_{0} = 0
+			      .\]
+		      We also have,
+		      \[
+			      c_0h_0+ 2(h_0 + h_1)c_1 + h_1c_2 = 3(
+			      .\]
+		      Eliminating $c_0$ gives,
+		      \[
+			      (\frac{h_0^2}{h_1} + 3h_0 + h_1) c_1 + (h_1-\frac{h_0^2}{h_1})c_2 = 3(f[x_1,x_2] - f[x_0,x_1])
 			      .\]
 		      On the other hand,
 		      \[
@@ -306,19 +339,24 @@
 		      \[
 			      -c_{n-2}h_{n-1} + (h_{n-1}+h_{n-2})c_{n-1} -c_{n}h_{n-2} = 0
 			      .\]
+		      Similarly as before, we get
+		      \[
+			      (\frac{h_{n-2}^2}{h_{n-1}} + 3h_{n-2} + h_{n-1}) c_{n-1} + (-h_{n-1}+\frac{h_{n-2}^2}{h_{n-1}})c_{n-1} = 3(f[x_1,x_2] - f[x_0,x_1])
+			      .\]
 		      Which gives the following linear system,
 		      \[
 			      A = \begin{pmatrix}
-				      -h_1 & (h_0+h_1)  & -h_1     &                     & 0       \\
-				      h_0  & 2(h_0+h_1) & h_1      &                     &         \\
-				           & \ddots     & \ddots   & \ddots              &         \\
-				           &            & h_{n-2}  & 2(h_{n-2} +h_{n-1}) & h_{n-1} \\
-				           &            & -h_{n-1} & (h_{n-2} +h_{n-1})  & h_{n-2} \\
+				       & \frac{h_0^2}{h_1} + 3h_0 + h_1 & h_1-\frac{h_0^2}{h_1}              &                                                & \\
+				       & \ddots                         & \ddots                             & \ddots                                         & \\
+				       &                                & -h_{n-1}+\frac{h_{n-2}^2}{h_{n-1}} & \frac{h_{n-2}^2}{h_{n-1}} + 3h_{n-2} + h_{n-1} & \\
 			      \end{pmatrix}
 			      .\]
 		      \[
-			      \vec{{c}} =  \begin{pmatrix} c_0\\ \vdots\\ c_n \end{pmatrix}
+			      \vec{{c}} =  \begin{pmatrix} c_1\\ \vdots\\ c_{n-1} \end{pmatrix}
 			      .\]
+		      \[
+			      \bm f = \begin{pmatrix} 3(f[x_1,x_2] - f[x_0,x_1])\\ \vdots\\ 3\left( f[x_{n-2}, x_{n-1}] - f[x_{n-3},x_{n-2}] \right)  \end{pmatrix}
+		      \]
 	\end{enumerate}
 \end{solution}
 \qs{Trigonometric interpolation and Discrete Fourier Transform}{
@@ -391,41 +429,108 @@
 			                & =  5 - e^{\frac{-\pi i}{4}} + 5e^{\frac{-\pi i }{2}} + e^{\frac{-\pi i }{4}} -5
 			      - e^{\frac{-3\pi i}{4}} + 5e^{\frac{-\pi i}{2}} - e^{\frac{-\pi i}{4}} \\
 			                & =  0 \\
-		      \end{align*}
-		\item Given that $\bm f = \left(5,1,5,0,0,0,0,0\right) $ we want to compute $\hat{\bm f} $
-
-		      \begin{align*}
-			      \hat{f}_0 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{0} = 11 \\
-			      \hat{f}_1 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-j} \\
-			                & =   5 + e^{\frac{-2\pi i}{8}} + 5e^{\frac{-4\pi i }{8}} + 0+0+ 0+ 0+ 0 \\
-			                & =  5 + e^{\frac{-\pi i}{4}} + 5 e^{\frac{-\pi i }{2}} \\
-			                & = 0 \\
-			      \hat{f}_2 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-2j} \\
-			                & =   5 + e^{\frac{-4\pi i}{8}} + 5e^{\frac{-8\pi i }{8}} + e^{\frac{-12\pi i }{8}} +5 e^{\frac{-16\pi i }{8}}
-			      + e^{\frac{-20\pi i}{8}} + 5e^{\frac{-24\pi i}{8}} + e^{\frac{-28\pi i}{8}} \\
-			                & =  5 + e^{\frac{-\pi i}{2}} + 5 e^{-\pi i } + e^{\frac{-3\pi i }{2}} +5
-			      + e^{\frac{-5\pi i}{2}} + 5e^{-3\pi i} + e^{\frac{-7\pi i}{2}} \\
-			                & =  5 + e^{\frac{-\pi i}{2}} - 5  - e^{\frac{-\pi i }{2}} +5
-			      + e^{\frac{-\pi i}{2}} - 5 - e^{\frac{-\pi i}{2}} \\
-			                & = 0 \\
-			      \hat{f}_3 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-3j} \\
-			                & =   5 + e^{\frac{-3\pi i}{4}} + 5e^{\frac{-6\pi i }{4}} + e^{\frac{-9\pi i }{4}} +5 e^{\frac{-12\pi i }{4}}
-			      + e^{\frac{-15\pi i}{4}} + 5e^{\frac{-18\pi i}{4}} + e^{\frac{-21\pi i}{4}} \\
-			                & =  5 + e^{\frac{-3\pi i}{4}} - 5e^{\frac{-\pi i }{2}} + e^{\frac{-\pi i }{4}} -5
-			      - e^{\frac{-3\pi i}{4}} + 5e^{\frac{-\pi i}{2}} - e^{\frac{-\pi i}{4}} \\
+			      \hat{f}_6 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-6j} \\
+			                & =   5 + e^{-3\pi i} + 5e^{-3\pi i } + e^{\frac{-9\pi i }{2}} +5 e^{-6\pi i }
+			      + e^{\frac{-15\pi i}{2}} + 5e^{-9\pi i} + e^{\frac{-21\pi i}{2}} \\
 			                & =  0 \\
-			      \hat{f}_4 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-4j} \\
-			                & =   5 + e^{1\pi i} + 5e^{2\pi i} + e^{3\pi i} +5 e^{4\pi i}
-			      + e^{5\pi i} + 5e^{6\pi i} + e^{7\pi i} \\
-			                & =  5 - 1 + 5 - 1 +5 -1  + 5 -1 \\
-			                & =  16 \\
-			      \hat{f}_5 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-5j} \\
-			                & =   5 + e^{\frac{-5\pi i}{4}} + 5e^{\frac{-5\pi i }{2}} + e^{\frac{-15\pi i }{4}} +5 e^{-5\pi i }
-			      + e^{\frac{-25\pi i}{4}} + 5e^{\frac{-15\pi i}{2}} + e^{\frac{-35\pi i}{4}} \\
+		      \end{align*}
+		      \begin{align*}
+			      \hat{f}_7 & = \sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-7j} \\
+			                & =   5 + e^{\frac{-7\pi i}{2}} + 5e^{-\frac{21\pi i}{4} } + e^{-7\pi i } +5 e^{-6\pi i }
+			      + e^{\frac{-15\pi i}{2}} + 5e^{-9\pi i} + e^{\frac{-21\pi i}{2}} \\
 			                & =  5 - e^{\frac{-\pi i}{4}} + 5e^{\frac{-\pi i }{2}} + e^{\frac{-\pi i }{4}} -5
 			      - e^{\frac{-3\pi i}{4}} + 5e^{\frac{-\pi i}{2}} - e^{\frac{-\pi i}{4}} \\
 			                & =  0 \\
 		      \end{align*}
+		\item We found that $\hat{ \bm f }= \left(24,0,0,16,0,0,0,0\right) $, now we set $f_4, \dots, f_7$, which gives $\tilde{\bm f} = \left( 24,0,0,0,0,0,0,0 \right)  $
+		      \begin{align*}
+			      \tilde{f}_0 & = \frac{1}{8}\sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{0}  = 3 \\
+			      \tilde{f}_1 & = \frac{1}{8}\sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-1}=   3 \\
+			      \tilde{f}_2 & =\frac{1}{8}\sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-2} =   3 \\
+			      \tilde{f}_3 & =\frac{1}{8}\sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-3} =   3 \\
+			      \tilde{f}_4 & =\frac{1}{8}\sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-4} =   3 \\
+			      \tilde{f}_5 & =\frac{1}{8}\sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-5} =   3 \\
+			      \tilde{f}_6 & =\frac{1}{8}\sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-6} =   3 \\
+			      \tilde{f}_7 & =\frac{1}{8}\sum_{j=0}^{7} f_{j} \left(e^{\frac{2\pi i}{8}}\right)^{-7} =   3 \\
+		      \end{align*}
+		\item \begin{enumerate}[label=(\roman*)]
+			      \item  We have,
+			            \begin{align*}
+				             & \hat{f}_k=\sum_{j=0}^{N-1} f_j \omega_{N}^{-j k} \quad N=2^m \\
+				             & \hat{f}_k=\sum_{j=0}^{\frac{N}{2}-1} f_{2 j} \omega_N^{-2 j k}+\sum_{j=0}^{\frac{N}{2}-1} f_{2 j+1}\omega_N^{(-2j-1) k} \\
+				             & =\sum_{j=0}^{\frac{N}{2}-1} f_{2 j} e^{-(2 \pi i /2^m){2j k}}+\sum_{j=0}^{\frac{N}{2}-1} f_{2 j+1} e^{-\frac{2 \pi ijk }{2^m}} \cdot e^{-\frac{2 \pi ik}{2^m}} \\
+				             & =\sum_{j=0}^{\frac{N}{2}-1} f_{2 j} e^{-(\frac{2 \pi i }{\frac{N}{2}}){j k}}+\sum_{j=0}^{\frac{N}{2}-1} f_{2 j+1} e^{-\frac{2 \pi ijk }{\frac{N}{2}}} \cdot e^{-\frac{2 \pi ik}{N}} \\
+				             & =\sum_{j=0}^{\frac{N}{2}-1} f_{2 j} \omega_{\frac{N}{2}}^{-j k}+\omega_{N}^{-k} \sum_{j=0}^{\frac{N}{2}-1} f_{2 j+1} \omega_{\frac{N}{2}}^{-jk} \\
+				             & \text { is the desired result. }
+			            \end{align*}
+			      \item
+			            $$
+				            \hat{f}_k=\sum_{j=0}^{\frac{N}{2}-1} f_{2 j}\left(\omega_{\frac{N}{2}}\right)^{-j k}+\omega_{N}^{-k} \sum_{j=0}^{\frac{N}{2}-1} f_{2 j+1}\left(\omega_{\frac{N}{2}}\right)^{-j k}
+			            $$
+			            For the first $\frac{N}{2}$ entries
+			            $ f_{\text{even}}$ \text{ is s.t } $f_{2 j}$ maps to $f_{\text {even}_j}$ \text{and} $f_{\text{odd}}$ is s.t $f_{2j+1}$ maps to $f_{\text{odd}_j}$\text{ then first half of $f$ can be written as}
+
+			            \begin{align*}
+				             & \quad \operatorname{FFT}\left(f_{\text {even }}, N / 2\right)+\vec{\alpha}\  {\odot}\  \operatorname{FFT}\left(f_{\text {odd }}, N / 2\right), \text{where } \vec{\alpha}=\left(1, \omega^{-1}, \ldots . \omega^{-\left(\frac{N}{2}-1\right)}\right)
+			            \end{align*}
+			            For the next $\frac{N}{2}$ entries, take $k<N / 2$
+			            \begin{align*}
+				             & \therefore \hat{f}_{k+\frac{N}{2}}=\sum_{j=0}^{\frac{N}{2}-1} f_{\text {even}_j} \omega_{\frac{N}{2}}^{-j(k+N / 2)}+\omega_{N}^{-(k+N / 2)} \sum_{j=0}^{\frac{N}{2}-1} f_{\text {odd}_j}\left(\omega_{\frac{N}{2}}^{-j\left(k+\frac{N}{2}\right)}\right) \\
+				             & =\sum_{j=0}^{N / 2-1} f_{\text {even}_j} \cdot \omega_{N / 2}^{-j k} \cdot \omega_{N / 2}^{-j N / 2}+\omega_{N}^{-\left( k+\frac{N}{2} \right) } \sum_{j=0}^{\frac{N}{2}-1} f_{\text {odd}_j} \cdot \omega_{\frac{N}{2}}^{-j k} \omega_{N / 2}^{-j N / 2} \\
+				             & =\sum_{j=0}^{N / 2-1} f_{\text{even}_j} \omega_{N / 2}^{-j k}+\omega_N^{-(k+\frac{N}{2} )} \sum_{j=0}^{\frac{N}{2}-1} f_{\text {odd}_j} \omega_{\frac{N}{2}}^{-jk} \\
+				             & =F F T\left(f_{\text {even }}, \frac{N}{2} \right)+\vec{\beta} \odot F F T\left(f_{\text {odd }}, \frac{N}{2}\right) \\
+			            \end{align*}
+			            where $\beta = \left( \omega^{-\frac{N}{2}},\dots, \omega^{-N} \right) $,
+			            $\vec{\omega}=\overrightarrow{\alpha} \mid \vec{\beta}$ \quad \text { where ' } '|' stands for   concatenation.
+			      \item We have : $T(N) = 2T(\frac{N}{2}) + \mathcal{O}(N)$, because for $N$ we have to compute FFT for $2$, $\frac{N}{2}$ quantities. Therefore,
+			            \[
+				            \begin{aligned}
+					            T(N)                             & = 2T\!\Bigl(\frac{N}{2}\Bigr) + \mathcal{O}(N), \\
+					            T\!\Bigl(\frac{N}{2}\Bigr)       & = 2T\!\Bigl(\frac{N}{4}\Bigr) + \mathcal{O}(N), \\
+					            T\!\Bigl(\frac{N}{4}\Bigr)       & = 2T\!\Bigl(\frac{N}{8}\Bigr)+\mathcal{O}(N)  , \\
+					                                             & \ \,\vdots                                      \\
+					            T\!\Bigl(\frac{N}{2^{m-1}}\Bigr) & = 2T\!\Bigl(\frac{N}{2^m}\Bigr)+\mathcal{O}(N).
+				            \end{aligned}
+			            \]
+			            There $\log_2 N$ equations above, so we have to do $T(f(n))$ amount of work $\log_2 N$ times.
+			            Notice that \(N = 2^m\). Hence, \(\frac{N}{2^m} = 1\). We have,
+			            \[
+				            T\!\Bigl(\frac{N}{2^{m-1}}\Bigr) = 2T(1).
+			            \]
+
+			            Rewriting:
+			            \[
+				            \begin{aligned}
+					            T(N) \;                             & -\; 2\,T\!\Bigl(\frac{N}{2}\Bigr)   & =                 & \; \mathcal{O}(N), \\
+					            T\!\Bigl(\frac{N}{2}\Bigr) \;       & -\; 2\,T\!\Bigl(\frac{N}{4}\Bigr)   & =                 & \; \mathcal{O}(N)
+					            ,                                                                                                                  \\
+					            T\!\Bigl(\frac{N}{4}\Bigr) \;       & -\; 2\,T\!\Bigl(\frac{N}{8}\Bigr)   & =                 & \; \mathcal{O}(N), \\
+					                                                & \quad \vdots                        &                   &                    \\
+					            T\!\Bigl(\frac{N}{2^{m-1}}\Bigr) \; & -\; 2\,T\!\Bigl(\frac{N}{2^m}\Bigr)
+					                                                & =                                   & \; \mathcal{O}(N)
+				            \end{aligned}
+			            \]
+
+			            When we add up all these equations (telescoping sum), almost all terms cancel, leaving:
+			            \[
+				            T(N) - 2^m T(1) = \mathcal{O}(N) \sum_{i=1}^{\log N} 1  = \mathcal{O}(N\log_2 N)
+			            \]
+			            Therfore,
+			            \[
+				            T(N) = N + \mathcal{O}(N\log_2 N)
+				            .\]
+			            \[
+				            T(N) = O(N \log N).
+			            \]
+			            For $m = 5,10,15,20$
+			            \begin{align*}
+				            R_5    & = \frac{2^5}{5} \text{times faster } \\
+				            R_{10} & = \frac{2^{10}}{10} \text{times faster } \\
+				            R_{15} & = \frac{2^{15}}{15} \text{times faster } \\
+				            R_{20} & = \frac{2^{20}}{20} \text{times faster } \\
+			            \end{align*}
+		      \end{enumerate}
+
 	\end{enumerate}
 \end{solution}
 
@@ -434,7 +539,7 @@
 		\item In solving boundary value problems with Neumann boundary conditions, derivative values at the boundary need to be approximated from one side of the boundary. For some constants $a, b, c$, design an one-sided finite difference approximation for $f^{\prime}(x)$ of the form,
 
 		      $$
-			      D_{h} f(x)=a f(x)+b f(x+h)+c f(x+2 h),
+			      D_{h} f(x)=af(x)+bf(x+h)+cf(x+2 h),
 		      $$
 
 		      with the highest degree of accuracy. Derive its error term and find the highest $p$ so that the error is bounded by $\mathcal{O}\left(h^{p}\right)$.\\
@@ -497,8 +602,8 @@
 			      D_{h}f(x)                       & =
 			      \frac{1}{2h} \left( -3f(x) + 4f(x) + 4 f'(x) h + 2f''(x)h^2 + \frac{2f'''(\xi_1)h^3}{3} \right. \\
 			                                      & \hspace{2cm} \left. - f\left( x \right) - 2f'(x)h - 2f''(x) h^2  -   \frac{4f'''(\xi_2)h^3}{3} +  \mathcal{O}(h^4) \right) \\
-			                                      & = \frac{1}{2h} \left(2f'(x)h-\frac{2}{3} \left( f'''(\xi_1) - 2f(\xi_2)) \right) h^3 + \mathcal{O}(h^{4}) \right) \\
-			      |D_{h}f\left(x \right) - f'(x)| & = \left|\frac{1}{3} (f'''(\xi_1) - f'''(\xi_2))h^2 + \mathcal{O}(h^{3})\right|\le \frac{2}{3} \underset{\xi\in[x,x+2h]}{\operatorname{max}} f'''\left( \xi \right) h^2 + \mathcal{O}(h^3)
+			                                      & = \frac{1}{2h} \left(2f'(x)h-\frac{2}{3} \left( f'''(\xi_1) - 2f'''(\xi_2)) \right) h^3 + \mathcal{O}(h^{4}) \right) \\
+			      |D_{h}f\left(x \right) - f'(x)| & = \left|\frac{1}{3} (f'''(\xi_1) - 2f'''(\xi_2))h^2 + \mathcal{O}(h^{3})\right|\le \underset{\xi\in[x,x+2h]}{\operatorname{max}} f'''\left( \xi \right) h^2 + \mathcal{O}(h^3)
 			      .\end{align*}
 		\item
 		      \begin{enumerate}[label=(\roman*)]
@@ -509,17 +614,58 @@
 			            \[
 				            I(f) \approx \sum_{i=1}^{n} \exp\left(\left(a+ih-\frac{h}{2}\right)^{2}\right) h
 			            \]
-
 			            Doing the integral using the trapezoidal rule we get,
 			            \[
-				            I(f) \approx I_\text{trapezoidal}(f) = h\left(\frac{f(a)}{2} +  \sum_{i=1}^{n} f\left(a+ih\right) + \frac{f(b)}{2}\right)
+				            I(f) \approx I_\text{trapezoidal}(f) = h\left(\frac{\exp(-a^2)}{2} +  \sum_{i=1}^{n-1} \exp\left(-(a+ih)^2\right) + \frac{\exp(-b^2)}{2} \right)
 				            .\]
-
 			            Doing the integral using the simpsons rule we get,
 			            \[
-				            I(f) \approx I_\text{simpson}(f) = \frac{h}{3}\left(\frac{f(a)}{2} + 4 \sum_{i=1}^{\frac{n}{2}} f\left(a+(2i-1)h\right)+2 \sum_{i=1}^{\frac{n}{2}-1} f\left(a+2ih\right)  + \frac{f(b)}{2}\right)
+				            \begin{split}
+					            I(f) \approx I_\text{simpson}(f) & = \frac{h}{3}\left(\frac{\exp(-a^2)}{2} + 4 \sum_{i=1}^{\frac{n}{2}} \exp\left(-(a+(2i-1)h)^2\right) \right. \\& \left.  \hspace{3cm}+2 \sum_{i=1}^{\frac{n}{2}-1} \exp\left(-(a+2ih)^2\right)  + \frac{\exp(-b^2)}{2} \right)
+					            .\end{split}
+			            \]
+			      \item  $f(x) = e^{-x^2}$,
+			            \begin{align*}
+				            f'(x)               & = -2xe^{-x^2} \\
+				            f''(x)              & = -2e^{-x^2} + 4x^2e^{-x^2} \\
+				            f'''(x)             & = 4xe^{-x^2} +8xe^{-x^2} -8x^3e^{-x^2} = 12xe^{-x^2} - 8x^3e^{-x^2} \\
+				            f''''\left(x\right) & = 12e^{-x^2} - 24x^2e^{-x^2} +16x^{4}e^{-x^2}
+			            \end{align*}
+			            From desmos, I saw that $M_2 = 2$
+			            \begin{align*}
+				            \|I_{\text{mid-point}}(f) - I(f)\| & \leq \frac{M_2}{24} h^2 + \mathcal{O}(h^3) \leq 10^{-6} \\
+				            \|I_{\text{mid-point}}(f) - I(f)\| & \leq \frac{1}{12} h^2 + \mathcal{O}(h^3) \leq 10^{-6} \\
+				            .\end{align*}
+			            For $h=\sqrt{12}  \times 10^{-3}$ we get the desired error tolerance.
+			            \begin{align*}
+				            \|I_{\text{trapezoidal}}(f) - I(f)\| & \leq \frac{M_2}{12} h^2 + \mathcal{O}(h^3) \leq 10^{-6} \\
+				            \|I_{\text{trapezoidal}}(f) - I(f)\| & \leq \frac{1}{6} h^2 + \mathcal{O}(h^3) \leq 10^{-6} \\
+				            .\end{align*}
+			            For $h= \sqrt{6}  \times 10^{-3}$ we get the desired error tolerance.
+			            From desmos, I saw that $M_4 = 12$
+			            \begin{align*}
+				            \|I_{\text{simpson}}(f) - I(f)\| & \leq \frac{1}{15} h^4 + \mathcal{O}(h^3) \leq 10^{-6} \\
+				            \|I_{\text{simpson}}(f) - I(f)\| & \leq \frac{1}{15} h^4 + \mathcal{O}(h^3) \leq 10^{-6} \\
+				            .\end{align*}
+			            For $ h =\sqrt[4]{15} \cdot 10^{-\frac{3}{2}}   $ we get the desired error tolerance.
+			      \item  $I\left( f \right) $ can be approximated using a 4pt gauss quadrature as follows,
+			            \begin{align*}
+				            I(f) = \int_0^1 f(x) dx & = \frac{b-a}{2 } \int_{-1}^{1} f(\frac{b-a}{2}x + \frac{b+a}{2}) dx \\
+				                                    & = \frac{1}{2} \frac{18+\sqrt{30}}{36} f\left( \frac{1}{2} \sqrt{\frac{3}{7}-\frac{2}{7} \sqrt{\frac{6}{5}}}+ \frac{1}{2}\right) +
+				            \frac{1}{2} \frac{18+\sqrt{30}}{36} f\left(- \frac{1}{2} \sqrt{\frac{3}{7}-\frac{2}{7} \sqrt{\frac{6}{5}}}+ \frac{1}{2}\right) \\
+				                                    & +\frac{1}{2} \frac{18-\sqrt{30}}{36} f\left( \frac{1}{2} \sqrt{\frac{3}{7}+\frac{2}{7} \sqrt{\frac{6}{5}}}+ \frac{1}{2}\right) \\
+				                                    & +\frac{1}{2} \frac{18-\sqrt{30}}{36} f\left(- \frac{1}{2} \sqrt{\frac{3}{7}+\frac{2}{7} \sqrt{\frac{6}{5}}}+ \frac{1}{2}\right)
+				            .\end{align*}
+		      \end{enumerate}
+		\item
+		      \begin{enumerate}[label=(\roman*)]
+			      \item Using the Richardson extrapolation theorem on, $I(f) = I_h(f) + \mathcal{O}(h^2)$ .
+			            Let $I_h = I_{h,0}$
+			            \[
+				            I_{h,1} = \frac{2^{2} I_{\frac{h}{2},0} - I_{h,0}}{2^{2} - 1} = \frac{4 I_{\frac{h}{2},0} - I_{h,0}}{3}
 				            .\]
-			      \item
+			            The expected improved order is $3$.
+			      \item In jupyter notebook.
 		      \end{enumerate}
 	\end{enumerate}
 \end{solution}
